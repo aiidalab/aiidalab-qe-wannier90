@@ -1,8 +1,9 @@
 """Panel for Wannier90 plugin."""
 
 from aiidalab_qe.common.panel import ConfigurationSettingsPanel
-
+import ipywidgets as ipw
 from .model import ConfigurationSettingsModel
+from aiidalab_qe.common.infobox import InAppGuide
 
 
 class ConfigurationSettingPanel(
@@ -14,6 +15,21 @@ class ConfigurationSettingPanel(
     def render(self):
         if self.rendered:
             return
+
+        self.exclude_semicore = ipw.Checkbox(
+            value=self._model.exclude_semicore,
+            description='Exclude semicore',
+            style={'description_width': 'initial'},
+        )
+
+        self.plot_wannier_functions = ipw.Checkbox(
+            value=self._model.plot_wannier_functions,
+            description='Compute real-space Wannier functions',
+            style={'description_width': 'initial'},
+        )
         self.children = [
+            InAppGuide(identifier='pdos-settings'),
+            self.exclude_semicore,
+            self.plot_wannier_functions,
         ]
         self.rendered = True

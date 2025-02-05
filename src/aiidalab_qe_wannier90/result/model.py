@@ -1,12 +1,67 @@
 from aiidalab_qe.common.panel import ResultsModel
 from aiida.common.extendeddicts import AttributeDict
+import traitlets as tl
+from aiida import orm
 
 
 class Wannier90ResultsModel(ResultsModel):
     title = 'Wannier90'
     identifier = 'wannier90'
+    structure = tl.Instance(orm.StructureData, allow_none=True)
+    bands_distance = tl.Float(allow_none=True)
+    wannier_centers_spreads = tl.Dict(allow_none=True)
+    omega_is = tl.List(allow_none=True)
+    omega_tots = tl.List(allow_none=True)
+    wannier90_outputs = tl.Dict(allow_none=True)
 
     _this_process_label = 'QeAppWannier90BandsWorkChain'
+
+    def update(self):
+        super().update()
+        root = self.fetch_process_node()
+        self.structure = root.inputs.wannier90.structure
+        self.bands_distance = root.outputs.wannier90.wannier90_bands.bands_distance.value
+        data = root.outputs.wannier90.wannier90_bands.wannier90_optimal.output_parameters.get_dict()
+        self.wannier90_outputs = {key: data[key] for key in ['number_wfs', 'Omega_D', 'Omega_I', 'Omega_OD']}
+        # Wannier centers/spreads
+        self.wannier_centers_spreads = self.get_wannier_centers_spreads(root)
+        self.omega_is, self.omega_tots = self.get_omega(root)
+
+    def get_omega(self, root):
+        omega_is = []
+        omega_tots = []
+        with root.outputs.wannier90.wannier90_bands.wannier90_optimal.retrieved.open('aiida.wout') as f:
+            lines = f.readlines()
+            for line in lines:
+                if '  <-- DIS' in line:
+                    omega_i = float(line.split()[2])
+                    omega_is.append(omega_i)
+                if '<-- SPRD' in line:
+                    omega_tot = float(line.split('O_TOT=')[1].split('<-- SPRD')[0])
+                    omega_tots.append(omega_tot)
+        return omega_is, omega_tots
+
+    def get_wannier_centers_spreads(self, node):
+        outputs = node.outputs.wannier90.wannier90_bands.wannier90_optimal.output_parameters.get_dict()
+        columns = [
+            {'field': 'wf', 'headerName': 'WF', 'editable': False},
+            {'field': 'spreads_final', 'headerName': 'Spreads final', 'editable': False},
+            {'field': 'centers_final', 'headerName': 'Centers final', 'editable': False, 'width': 200,},
+            {'field': 'spreads_initial', 'headerName': 'Spreads initial', 'editable': False},
+            {'field': 'centers_initial', 'headerName': 'Centers initial', 'editable': False, 'width': 200,},
+        ]
+        centers_spreads = {'columns': columns,
+                           'data': []}
+        for i in range(len(outputs['wannier_functions_initial'])):
+            data = {
+                'wf': i,
+                'spreads_final': outputs['wannier_functions_output'][i]['wf_spreads'],
+                'centers_final': str(outputs['wannier_functions_output'][i]['wf_centres']),
+                'spreads_initial': outputs['wannier_functions_initial'][i]['wf_spreads'],
+                'centers_initial': str(outputs['wannier_functions_initial'][i]['wf_centres']),
+            }
+            centers_spreads['data'].append(data)
+        return centers_spreads
 
     def get_bands_node(self):
         outputs = self._get_child_outputs()
