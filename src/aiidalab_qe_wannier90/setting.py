@@ -35,9 +35,29 @@ class ConfigurationSettingPanel(
             (self._model, 'plot_wannier_functions'),
             (self.plot_wannier_functions, 'value'),
         )
+        self.number_of_disproj_max = ipw.IntText(
+            value=self._model.number_of_disproj_max,
+            description='Number of dis_proj_max',
+            style={'description_width': 'initial'},
+        )
+        ipw.link(
+            (self._model, 'number_of_disproj_max'),
+            (self.number_of_disproj_max, 'value'),
+        )
+        self.number_of_disproj_min = ipw.IntText(
+            value=self._model.number_of_disproj_min,
+            description='Number of dis_proj_min',
+            style={'description_width': 'initial'},
+        )
+        ipw.link(
+            (self._model, 'number_of_disproj_min'),
+            (self.number_of_disproj_min, 'value'),
+        )
         self.children = [
             InAppGuide(identifier='pdos-settings'),
             self.exclude_semicore,
             self.plot_wannier_functions,
+            self.number_of_disproj_max,
+            self.number_of_disproj_min,
         ]
         self.rendered = True

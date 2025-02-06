@@ -14,6 +14,8 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
     ]
     exclude_semicore = tl.Bool(allow_none=True, default_value=True)
     plot_wannier_functions = tl.Bool(allow_none=True, default_value=False)
+    number_of_disproj_max = tl.Int(allow_none=True, default_value=15)
+    number_of_disproj_min = tl.Int(allow_none=True, default_value=2)
 
     protocol = tl.Unicode(allow_none=True)
 
@@ -21,8 +23,12 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
         return {
             'exclude_semicore': self.exclude_semicore,
             'plot_wannier_functions': self.plot_wannier_functions,
+            'number_of_disproj_max': self.number_of_disproj_max,
+            'number_of_disproj_min': self.number_of_disproj_min,
         }
 
     def set_model_state(self, parameters: dict):
         self.exclude_semicore = parameters.get('exclude_semicore', True)
         self.plot_wannier_functions = parameters.get('plot_wannier_functions', False)
+        self.number_of_disproj_max = parameters.get('number_of_disproj_max', 15)
+        self.number_of_disproj_min = parameters.get('number_of_disproj_min', 2)
