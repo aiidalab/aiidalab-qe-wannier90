@@ -19,7 +19,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
 
     def _render(self):
         """Render the Wannier90 results panel."""
-        self._model.update()
+        self._model.fetch_result()
 
         # Retrieve band structures
         pw_bands, wannier90_bands = self._model.get_bands_node()
@@ -74,6 +74,9 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         self.structure_viewer = WeasWidget()
         atoms = self._model.structure.get_ase()
         self.structure_viewer.from_ase(atoms)
+        # isosurface
+        self.all_isosurface = self._model.get_isosurface()
+
         structure_viewer_section = ipw.VBox([
             ipw.HTML('<h3>Structure</h3>'),
             self.structure_viewer,
@@ -92,6 +95,9 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
             self.table
         ], layout=ipw.Layout(margin='10px 0'))
 
+
+
+
         # Arrange components in the panel
         self.children = [
             ipw.VBox([
@@ -108,7 +114,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
 
     def on_single_row_select(self, change):
         id = change['new']
-        center = [row['centers_final'] for row in self.table.data if row['wf'] == id][0]
+        center = [row['centers_final'] for row in self.table.data if row['id'] == id][0]
         center = ast.literal_eval(center)
         atoms = self._model.structure.get_ase()
         positions = atoms.get_positions()
@@ -118,3 +124,23 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         # Find all atoms that are within the threshold of the minimum distance
         indices = np.where(np.abs(distances - min_distance) < DISTANCE_THRESHOLD)[0]
         self.structure_viewer.avr.selected_atoms_indices = indices.tolist()
+        key = f'aiida_{int(id):05d}'
+        isosurface = self.all_isosurface[key]
+        if 'isosurface' in isosurface:
+            vertices = isosurface['isosurface']['vertices']
+            vertices = [item for sublist in vertices for item in sublist]
+            faces = isosurface['isosurface']['faces']
+            faces = [item for sublist in faces for item in sublist]
+            data = [
+                {
+                    'name': key,
+                    'color': [0.0, 1.0, 0.0, 0.8],
+                    'material': 'Standard',
+                    'position': [0, 0.0, 0.0],
+                    'vertices': vertices,
+                    'faces': faces,
+                },
+            ]
+            self.structure_viewer.any_mesh.settings = data
+        else:
+            self.structure_viewer.any_mesh.settings = []

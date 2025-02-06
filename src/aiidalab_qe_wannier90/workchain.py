@@ -40,7 +40,7 @@ def get_builder(codes, structure, parameters, **kwargs):
 
     scf_overrides = deepcopy(parameters['advanced'])
     nscf_overrides = deepcopy(parameters['advanced'])
-    # wannier90_overrides = deepcopy(parameters['wannier90'])
+    wannier90_parameters = deepcopy(parameters['wannier90'])
 
     overrides = {
         'nscf': nscf_overrides,
@@ -61,8 +61,8 @@ def get_builder(codes, structure, parameters, **kwargs):
         protocol=protocol,
         overrides=overrides,
         parallelization=parallelization,
-        # exclude_semicore=wannier90_overrides['exclude_semicore'],
-        # plot_wannier_functions=wannier90_overrides['plot_wannier_functions'],
+        exclude_semicore=wannier90_parameters['exclude_semicore'],
+        plot_wannier_functions=wannier90_parameters['plot_wannier_functions'],
         electronic_type=ElectronicType(parameters['workchain']['electronic_type']),
         spin_type=SpinType(parameters['workchain']['spin_type']),
         initial_magnetic_moments=parameters['advanced']['initial_magnetic_moments'],

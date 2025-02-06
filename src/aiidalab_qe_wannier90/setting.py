@@ -21,11 +21,19 @@ class ConfigurationSettingPanel(
             description='Exclude semicore',
             style={'description_width': 'initial'},
         )
+        ipw.link(
+            (self._model, 'exclude_semicore'),
+            (self.exclude_semicore, 'value'),
+        )
 
         self.plot_wannier_functions = ipw.Checkbox(
             value=self._model.plot_wannier_functions,
             description='Compute real-space Wannier functions',
             style={'description_width': 'initial'},
+        )
+        ipw.link(
+            (self._model, 'plot_wannier_functions'),
+            (self.plot_wannier_functions, 'value'),
         )
         self.children = [
             InAppGuide(identifier='pdos-settings'),
