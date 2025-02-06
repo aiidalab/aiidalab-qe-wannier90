@@ -16,6 +16,27 @@ class ConfigurationSettingPanel(
         if self.rendered:
             return
 
+        # Warning message
+        warning_message = ipw.HTML(
+            """<div style="color: red; font-weight: bold; border: 1px solid red; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+            ⚠️ This plugin requires the Wannier90 code from the latest source code from the <a href="https://github.com/wannier-developers/wannier90" target="_blank">Wannier90 GitHub repository</a>.
+            </div>"""
+        )
+
+        # Workflow explanation
+        workflow_explanation = ipw.HTML(
+            """<details style="margin-bottom: 10px;">
+            <summary style="font-weight: bold;">📘 Workflow Overview</summary>
+            <div style="padding-left: 10px; margin-top: 5px;">
+            This workflow consists of two main steps:
+            <ul>
+                <li><strong>Step 1:</strong> Run a <code>PwBandsWorkChain</code> to compute the SCF charge density and PW bands.</li>
+                <li><strong>Step 2:</strong> Use the SCF charge density as input for <code>Wannier90OptimizeWorkChain</code>. It will compare with PW bands internally and output a value <code>bands_distance</code> (typically good if ≤ 30 meV).</li>
+            </ul>
+            </div>
+            </details>"""
+        )
+
         self.exclude_semicore = ipw.Checkbox(
             value=self._model.exclude_semicore,
             description='Exclude semicore',
@@ -82,7 +103,9 @@ class ConfigurationSettingPanel(
             (self.frozen_type, 'value'),
         )
         self.children = [
+            warning_message,
             InAppGuide(identifier='pdos-settings'),
+            workflow_explanation,
             self.exclude_semicore,
             self.plot_wannier_functions,
             self.compute_hamiltonian,
