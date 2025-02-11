@@ -12,6 +12,7 @@ class Wannier90ResultsModel(ResultsModel):
     wannier_centers_spreads = tl.Dict(allow_none=True)
     omega_is = tl.List(allow_none=True)
     omega_tots = tl.List(allow_none=True)
+    im_re_ratio = tl.List(allow_none=True)
     wannier90_outputs = tl.Dict(allow_none=True)
 
     _this_process_label = 'QeAppWannier90BandsWorkChain'

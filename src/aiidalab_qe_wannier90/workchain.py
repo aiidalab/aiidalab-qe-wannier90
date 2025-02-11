@@ -16,6 +16,8 @@ def get_builder(codes, structure, parameters, **kwargs):
     wannier90_parameters = deepcopy(parameters['wannier90'])
     exclude_semicore=wannier90_parameters.pop('exclude_semicore')
     plot_wannier_functions=wannier90_parameters.pop('plot_wannier_functions')
+    retrieve_hamiltonian=wannier90_parameters.pop('retrieve_hamiltonian')
+    retrieve_matrices=wannier90_parameters.pop('retrieve_matrices')
 
     all_codes = {
                 'pw': codes.get('pw')['code'],
@@ -52,6 +54,8 @@ def get_builder(codes, structure, parameters, **kwargs):
         electronic_type=ElectronicType(parameters['workchain']['electronic_type']),
         spin_type=SpinType(parameters['workchain']['spin_type']),
         initial_magnetic_moments=parameters['advanced']['initial_magnetic_moments'],
+        retrieve_hamiltonian=retrieve_hamiltonian,
+        retrieve_matrices=retrieve_matrices,
         **kwargs,
     )
     return builder
