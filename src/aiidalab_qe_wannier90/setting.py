@@ -16,7 +16,7 @@ class ConfigurationSettingPanel(
         self.error_message = ipw.HTML()
         # Warning message
         self.warning_message = ipw.HTML(
-            """<div style="color: yellow; font-weight: bold; border: 1px solid red; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+            """<div style="color: blue; font-weight: bold; border: 1px solid red; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
             ⚠️ This plugin requires the Wannier90 code from the latest source code from the <a href="https://github.com/wannier-developers/wannier90" target="_blank">Wannier90 GitHub repository</a>.
             </div>"""
         )
