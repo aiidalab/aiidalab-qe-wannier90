@@ -81,6 +81,8 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         self.structure_viewer = WeasWidget()
         atoms = self._model.structure.get_ase()
         self.structure_viewer.from_ase(atoms)
+        self.structure_viewer.avr.color_type = "VESTA"
+        self.structure_viewer.avr.boundary = [[-0.05, 0.05], [-0.05, 0.05], [-0.05, 0.05]]
         # isosurface
         self.all_isosurface = self._model.get_isosurface()
 
