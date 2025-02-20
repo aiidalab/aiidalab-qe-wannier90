@@ -17,7 +17,8 @@ class ConfigurationSettingPanel(
         # Warning message
         self.warning_message = ipw.HTML(
             """<div style="color: blue; font-weight: bold; border: 1px solid red; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-            ⚠️ This plugin requires the Wannier90 code from the latest source code from the <a href="https://github.com/wannier-developers/wannier90" target="_blank">Wannier90 GitHub repository</a>.
+                ⚠️ This plugin requires the Wannier90 code from the latest source code from the
+                <a href="https://github.com/wannier-developers/wannier90" target="_blank" style="color: red; font-weight: bold; text-decoration: underline;">Wannier90 GitHub repository</a>.
             </div>"""
         )
 
@@ -38,12 +39,13 @@ class ConfigurationSettingPanel(
             <div style="padding-left: 10px; margin-top: 5px;">
             This workflow consists of two main steps:
             <ul>
-                <li><strong>Step 1:</strong> Run a <code>PwBandsWorkChain</code> to compute the SCF charge density and PW bands.</li>
-                <li><strong>Step 2:</strong> Use the SCF charge density as input for <code>Wannier90OptimizeWorkChain</code>. It will compare with PW bands internally and output a value <code>bands_distance</code> (typically good if ≤ 30 meV).</li>
+                <li><strong>Step 1:</strong> Run a Quantum ESPRESSO workflow (<code>PwBandsWorkChain</code>) to compute the self-consistent (SCF) DFT charge density and corresponding DFT band structure along a standard path.</li>
+                <li><strong>Step 2:</strong> Use the SCF charge density as input for the Wannierization workflow, using the Wannier90 code (<code>Wannier90OptimizeWorkChain</code>). The workflow will compute maximally localized Wannier functions (MLWFs) and compare the interpolated bands with the DFT bands internally. The corresponding band distance <code>η</code> is one of the outputs and is a measure of the interpolation quality (typically good if <code>η ≤ 30</code> meV).</li>
             </ul>
             </div>
             </details>"""
         )
+
 
         self.exclude_semicore = ipw.Checkbox(
             value=self._model.exclude_semicore,
@@ -139,3 +141,5 @@ class ConfigurationSettingPanel(
             self.error_message.value = """<div style="color: red; font-weight: bold; border: 1px solid red; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
             ⚠️ Electronic type: Insulator setting is not supported yet. You can still use the Metal setting even if your material is an insulator.
             </div>"""
+        else:
+            self.error_message.value = ''

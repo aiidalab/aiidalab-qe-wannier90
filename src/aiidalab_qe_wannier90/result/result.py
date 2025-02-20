@@ -27,9 +27,12 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
 
         # Retrieve band structures
         pw_bands, wannier90_bands = self._model.get_bands_node()
-        wannier90_bands['plot_settings'] = {'dash': 'dash'}
+        wannier90_bands['trace_settings'] = {'dash': 'dash',
+                                             'shape': 'linear',
+                                             'color': 'red'}
         model = BandsPdosModel(bands = pw_bands,
-                               external_bands = {'wannier90_bands': wannier90_bands}
+                               external_bands = {'Wannier-interpolated bands': wannier90_bands},
+                               plot_settings = {'bands_trace_settings': {'name': 'DFT Bands'}},
                             )
 
         # Create and render the bands/PDOS widget
@@ -111,7 +114,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         # Arrange components in the panel
         self.children = [
             ipw.VBox([
-                ipw.HTML('<h2>Bands structure</h2>'),
+                ipw.HTML('<h2>DFT and Wannier-interpolated electronic band structure</h2>'),
                 bands_widget,
             ]),
             ipw.VBox([
