@@ -83,6 +83,24 @@ class ConfigurationSettingPanel(
             (self._model, 'plot_wannier_functions'),
             (self.plot_wannier_functions, 'value'),
         )
+        self.compute_fermi_surface = ipw.Checkbox(
+            value=self._model.compute_fermi_surface,
+            description='Compute Fermi surface',
+            style={'description_width': 'initial'},
+        )
+        ipw.link(
+            (self._model, 'compute_fermi_surface'),
+            (self.compute_fermi_surface, 'value'),
+        )
+        self.fermi_surface_kpoint_distance = ipw.FloatText(
+            value=self._model.fermi_surface_kpoint_distance,
+            description=r'Fermi surface k-point distance (Å$^{-1}$)',
+            style={'description_width': 'initial'},
+        )
+        ipw.link(
+            (self._model, 'fermi_surface_kpoint_distance'),
+            (self.fermi_surface_kpoint_distance, 'value'),
+        )
         self.number_of_disproj_max = ipw.IntText(
             value=self._model.number_of_disproj_max,
             description='Number of dis_proj_max',
@@ -217,6 +235,8 @@ class ConfigurationSettingPanel(
             self.exclude_semicore,
             self.plot_wannier_functions,
             self.retrieve_hamiltonian,
+            self.compute_fermi_surface,
+            self.fermi_surface_kpoint_distance,
             self.algorithm_description,
             self.projection_selection_widget,
             self.frozen_states_widget,
