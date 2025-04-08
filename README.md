@@ -5,7 +5,7 @@ A plugin for running Wannier calculations inside the AiiDAlab Quantum ESPRESSO A
 ## Features
 
 - **Band structure comparison** with DFT bands.
-- With predefined protocols (`moderate`, `precise`, `fast`).
+- With predefined protocols (`fast`, `balanced`, `stringent`)
 - **Optional real-space Wannier functions** (3D visualization) with the atomic structure.
 
 <img src="docs/source/_static/images/overview.png"  width="800px"/>
