@@ -17,6 +17,30 @@ A plugin for running Wannier calculations inside the AiiDAlab Quantum ESPRESSO A
 ## Usage
 Run Wannier calculations via the AiiDAlab QE App GUI.
 
+## PythonJob code
+To setup the `python` code for isosurface calculation, you need to install the following packages in the Python environment:
+
+```
+cloudpickle
+scikit-image
+ase
+```
+
+Here is an example configuration file to setup the `python` code on HPC:
+
+```yaml
+---
+label: python3
+description: python3.9.10 at Merlin 7
+default_calc_job_plugin: pythonjob.pythonjob
+filepath_executable: /opt/psi/Programming/Python/3.9.10/bin/python
+prepend_text: |
+    module purge
+    module load Python/3.9.10
+append_text: ''
+```
+
+
 
 
 ## Compile Wanntier90
