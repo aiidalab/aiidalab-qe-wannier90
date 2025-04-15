@@ -65,8 +65,6 @@ class QeAppWannier90BandsWorkChain(WorkChain):
         protocol=None,
         parallelization=None,
         overrides=None,
-        compute_fermi_surface=False,
-        fermi_surface_kpoint_distance=None,
         **kwargs,
     ):
         """Return a BandsWorkChain builder prepopulated with inputs following the specified protocol

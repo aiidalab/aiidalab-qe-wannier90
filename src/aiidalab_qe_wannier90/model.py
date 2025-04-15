@@ -49,5 +49,3 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
         self.plot_wannier_functions = parameters.get('plot_wannier_functions', False)
         self.number_of_disproj_max = parameters.get('number_of_disproj_max', 15)
         self.number_of_disproj_min = parameters.get('number_of_disproj_min', 2)
-        self.compute_fermi_surface = parameters.get('compute_fermi_surface', False)
-        self.fermi_surface_kpoint_distance = parameters.get('fermi_surface_kpoint_distance', 0.04)

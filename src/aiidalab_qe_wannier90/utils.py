@@ -63,3 +63,25 @@ def process_xsf_files(folder: str = 'parent_folder'):
     return {'atoms': atoms,
             'parameters': parameters,
             'mesh_data': mesh_data}
+
+def create_download_link(obj, filename, description='Download'):
+    """Create a download link for a file in the AiiDA repository using a temporary directory."""
+    import base64
+    import shutil
+    import tempfile
+    import ipywidgets as ipw
+    from pathlib import Path
+    # Create a temporary directory to store the file
+    # Copy the file from the AiiDA repository to the temporary directory
+    with obj.as_path(filename) as source_path:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir) / filename
+            shutil.copy(source_path, tmp_path)
+
+            with open(tmp_path, 'rb') as f:
+                b64 = base64.b64encode(f.read()).decode()
+
+    # At this point, we no longer need the file; it's encoded.
+    payload = f'data:application/octet-stream;base64,{b64}'
+    html = f'<a download="{filename}" href="{payload}" target="_blank">{description}</a>'
+    return ipw.HTML(html)
