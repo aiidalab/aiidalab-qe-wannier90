@@ -25,12 +25,24 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
     energy_window_input = tl.Float(allow_none=True, default_value=2.0)
     compute_fermi_surface = tl.Bool(allow_none=True, default_value=False)
     fermi_surface_kpoint_distance = tl.Float(allow_none=True, default_value=0.04)
+    compute_dhva_frequencies = tl.Bool(allow_none=True, default_value=False)
+    # dHvA frequencies
+    dHvA_frequencies_parameters = tl.Dict(
+        allow_none=True,
+        default_value={
+            'starting_phi': 0.0,
+            'starting_theta': 90.0,
+            'ending_phi': 90.0,
+            'ending_theta': 90.0,
+            'num_rotation': 90,
+        }
+        )
 
     protocol = tl.Unicode(allow_none=True)
     electronic_type = tl.Unicode(allow_none=True)
 
     def get_model_state(self):
-        return {
+        state = {
             'exclude_semicore': self.exclude_semicore,
             'plot_wannier_functions': self.plot_wannier_functions,
             'retrieve_hamiltonian': self.retrieve_hamiltonian,
@@ -41,11 +53,21 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
             'frozen_type': self.frozen_type,
             'energy_window_input': self.energy_window_input,
             'compute_fermi_surface': self.compute_fermi_surface,
-            'fermi_surface_kpoint_distance': self.fermi_surface_kpoint_distance,
         }
+        if self.compute_fermi_surface:
+            state |= {
+                'fermi_surface_kpoint_distance': self.fermi_surface_kpoint_distance,
+                'compute_dhva_frequencies': self.compute_dhva_frequencies,
+            }
+            if self.compute_dhva_frequencies:
+                state |= {
+                    'dHvA_frequencies_parameters': self.dHvA_frequencies_parameters,
+                }
+        return state
 
     def set_model_state(self, parameters: dict):
         self.exclude_semicore = parameters.get('exclude_semicore', True)
         self.plot_wannier_functions = parameters.get('plot_wannier_functions', False)
         self.number_of_disproj_max = parameters.get('number_of_disproj_max', 15)
         self.number_of_disproj_min = parameters.get('number_of_disproj_min', 2)
+        self.compute_dhva_frequencies = parameters.get('compute_dhva_frequencies', False)

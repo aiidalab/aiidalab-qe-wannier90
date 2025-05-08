@@ -94,3 +94,13 @@ class Wannier90ResultsModel(ResultsModel):
         mesh_data = outputs.generate_isosurface.mesh_data
 
         return {'atoms': atoms, 'parameters': parameters, 'mesh_data': mesh_data}
+
+    def get_skeaf(self) -> dict:
+        outputs = self._get_child_outputs()
+        if 'skeaf' not in outputs:
+            return None
+        skeaf_results = {}
+        for band in outputs.skeaf.skeaf:
+            frequency = outputs.skeaf.skeaf[band].frequency
+            skeaf_results[band] = frequency
+        return skeaf_results

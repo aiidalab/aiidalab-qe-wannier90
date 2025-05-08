@@ -12,6 +12,11 @@ class ConfigurationSettingPanel(
     def __init__(self, model: ConfigurationSettingsModel, **kwargs):
         super().__init__(model, **kwargs)
 
+        # Initialize attributes to avoid AttributeError
+        self.compute_fermi_surface = None
+        self.params_fermi_surface_vbox = ipw.VBox([])
+        self.params_dhva_freqs_vbox = ipw.VBox([])
+
         # error message
         self.error_message = ipw.HTML()
         # Warning message
@@ -25,6 +30,14 @@ class ConfigurationSettingPanel(
         self._model.observe(
             self._on_electronic_type_change,
             'electronic_type',
+        )
+        self._model.observe(
+            self._on_compute_fermi_surface_change,
+            'compute_fermi_surface',
+        )
+        self._model.observe(
+            self._on_compute_dhva_freqs_change,
+            'compute_dhva_frequencies',
         )
 
     def render(self):
@@ -84,7 +97,7 @@ class ConfigurationSettingPanel(
             (self.plot_wannier_functions, 'value'),
         )
         self.compute_fermi_surface = ipw.Checkbox(
-            value=self._model.compute_fermi_surface,
+            value = self._model.compute_fermi_surface,
             description='Compute Fermi surface',
             style={'description_width': 'initial'},
         )
@@ -96,11 +109,67 @@ class ConfigurationSettingPanel(
             value=self._model.fermi_surface_kpoint_distance,
             description=r'Fermi surface k-point distance (Å$^{-1}$)',
             style={'description_width': 'initial'},
+            layout=ipw.Layout(margin='0 0 0 30px'),
         )
         ipw.link(
             (self._model, 'fermi_surface_kpoint_distance'),
             (self.fermi_surface_kpoint_distance, 'value'),
         )
+        self.compute_dhva_frequencies = ipw.Checkbox(
+            value=self._model.compute_dhva_frequencies,
+            description='Compute de Haas-van Alphen frequencies',
+            style={'description_width': 'initial'},
+            layout=ipw.Layout(margin='0 0 0 20px'),
+        )
+        ipw.link(
+            (self._model, 'compute_dhva_frequencies'),
+            (self.compute_dhva_frequencies, 'value'),
+        )
+        self.params_fermi_surface_vbox = ipw.VBox([])
+        self.params_dhva_freqs_vbox = ipw.VBox([], layout=ipw.Layout(margin='0 0 0 40px'))
+
+        self.params_dhva_freqs_starting_phi = ipw.FloatText(
+            value=self._model.dHvA_frequencies_parameters['starting_phi'],
+            description='φ', layout=ipw.Layout(width='130px')
+            )
+        self.params_dhva_freqs_starting_theta = ipw.FloatText(
+            value=self._model.dHvA_frequencies_parameters['starting_theta'],
+            description='θ', layout=ipw.Layout(width='130px')
+            )
+        self.params_dhva_freqs_starting_label = ipw.Text(description='label', placeholder='optional', layout=ipw.Layout(width='200px'))
+
+        # Final orientation inputs
+        self.params_dhva_freqs_ending_phi = ipw.FloatText(
+            value=self._model.dHvA_frequencies_parameters['ending_phi'],
+            description='φ', layout=ipw.Layout(width='130px'), default_value=90.0
+            )
+        self.params_dhva_freqs_ending_theta = ipw.FloatText(
+            value=self._model.dHvA_frequencies_parameters['ending_theta'],
+            description='θ', layout=ipw.Layout(width='130px'), default_value=90.0
+            )
+        self.params_dhva_freqs_ending_label = ipw.Text(description='label', placeholder='optional', layout=ipw.Layout(width='200px'))
+
+        # Assemble rows
+        self.params_dhva_freqs_first_row = ipw.HBox([
+            ipw.Label('Starting magnetic field orientation:', layout=ipw.Layout(width='200px')),
+            self.params_dhva_freqs_starting_phi,
+            self.params_dhva_freqs_starting_theta,
+            self.params_dhva_freqs_starting_label
+        ])
+
+        self.params_dhva_freqs_second_row = ipw.HBox([
+            ipw.Label('Final magnetic field orientation:', layout=ipw.Layout(width='200px')),
+            self.params_dhva_freqs_ending_phi,
+            self.params_dhva_freqs_ending_theta,
+            self.params_dhva_freqs_ending_label
+        ])
+        self.params_dhva_freqs_third_row = ipw.IntText(
+            value=self._model.dHvA_frequencies_parameters['num_rotation'],
+            description='Number of rotation steps',
+            style={'description_width': 'initial'},
+        )
+
+
         self.number_of_disproj_max = ipw.IntText(
             value=self._model.number_of_disproj_max,
             description='Number of dis_proj_max',
@@ -236,7 +305,8 @@ class ConfigurationSettingPanel(
             self.plot_wannier_functions,
             self.retrieve_hamiltonian,
             self.compute_fermi_surface,
-            self.fermi_surface_kpoint_distance,
+            self.params_fermi_surface_vbox,
+            self.params_dhva_freqs_vbox,
             self.algorithm_description,
             self.projection_selection_widget,
             self.frozen_states_widget,
@@ -259,3 +329,29 @@ class ConfigurationSettingPanel(
             self.energy_window_widget.layout.display = 'block'
         else:
             self.energy_window_widget.layout.display = 'none'
+
+    def _on_compute_fermi_surface_change(self, change):
+        # Ensure the widget is initialized before accessing it
+        if self.compute_fermi_surface is None:
+            return
+
+        if self.compute_fermi_surface.value:
+            self.params_fermi_surface_vbox.children = [
+                self.fermi_surface_kpoint_distance,
+                self.compute_dhva_frequencies,
+            ]
+        else:
+            self.params_fermi_surface_vbox.children = []
+
+    def _on_compute_dhva_freqs_change(self, change):
+        # Ensure the widget is initialized before accessing it
+        if self.compute_fermi_surface is None:
+            return
+        if self.compute_fermi_surface.value and self.compute_dhva_frequencies.value:
+            self.params_dhva_freqs_vbox.children = [
+                self.params_dhva_freqs_first_row,
+                self.params_dhva_freqs_second_row,
+                self.params_dhva_freqs_third_row,
+            ]
+        else:
+            self.params_dhva_freqs_vbox.children = []
