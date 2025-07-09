@@ -161,7 +161,7 @@ class QeAppWannier90BandsWorkChain(WorkChain):
         wannier90_parameters = overrides.pop('wannier90_parameters', {})
         number_of_disproj_max = wannier90_parameters.pop('number_of_disproj_max', 15)
         number_of_disproj_min = wannier90_parameters.pop('number_of_disproj_min', 2)
-        kwargs_filtered = {k: v for k, v in self.inputs.kwargs.items() if k != 'compute_dhva_frequencies'}
+        kwargs_filtered = {k: v for k, v in self.inputs.kwargs.items() if k not in ['compute_dhva_frequencies','dHvA_frequencies_parameters']}
         codes = {key: value for key, value in self.inputs.codes.items()}
         builder = Wannier90OptimizeWorkChain.get_builder_from_protocol(
             codes = codes,
@@ -248,7 +248,10 @@ class QeAppWannier90BandsWorkChain(WorkChain):
             overrides = {}
         kwargs = self.inputs.kwargs if 'kwargs' in self.inputs else {}
         wannier_node = self.ctx.wannier90_bands
-        wannier_calc = wannier_node.outputs.wannier90_optimal.output_parameters.creator
+        try:
+            wannier_calc = wannier_node.outputs.wannier90_plot.output_parameters.creator
+        except AttributeError:
+            wannier_calc =  wannier_node.outputs.wannier90_optimal.output_parameters.creator
         parent_folder = wannier_calc.outputs.remote_folder
         pseudos = self.inputs.overrides.pw_bands['scf']['pw']['pseudos']
         structure = wannier_calc.inputs.structure

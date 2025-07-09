@@ -26,7 +26,7 @@ def plot_skeaf(skeaf_data):
     import plotly.express as px
     import plotly.graph_objects as go
 
-    x = []         # theta values
+    x = []         # angle values
     y = []         # freq values
     labels = []    # band names for color grouping
     xlabel = 'Rotation step'

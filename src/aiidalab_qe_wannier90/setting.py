@@ -128,47 +128,66 @@ class ConfigurationSettingPanel(
         self.params_fermi_surface_vbox = ipw.VBox([])
         self.params_dhva_freqs_vbox = ipw.VBox([], layout=ipw.Layout(margin='0 0 0 40px'))
 
-        self.params_dhva_freqs_starting_phi = ipw.FloatText(
-            value=self._model.dHvA_frequencies_parameters['starting_phi'],
-            description='φ', layout=ipw.Layout(width='130px')
+        self.dhva_starting_phi = ipw.FloatText(
+            value=self._model.dhva_starting_phi,
+            description='φ (°)', layout=ipw.Layout(width='130px')
             )
-        self.params_dhva_freqs_starting_theta = ipw.FloatText(
-            value=self._model.dHvA_frequencies_parameters['starting_theta'],
-            description='θ', layout=ipw.Layout(width='130px')
+        ipw.link(
+            (self._model, 'dhva_starting_phi'),
+            (self.dhva_starting_phi, 'value'),
+        )
+        self.dhva_starting_theta = ipw.FloatText(
+            value=self._model.dhva_starting_theta,
+            description='θ (°)', layout=ipw.Layout(width='130px')
             )
-        self.params_dhva_freqs_starting_label = ipw.Text(description='label', placeholder='optional', layout=ipw.Layout(width='200px'))
+        ipw.link(
+            (self._model, 'dhva_starting_theta'),
+            (self.dhva_starting_theta, 'value'),
+        )
+        self.dhva_starting_label = ipw.Text(description='label', placeholder='optional', layout=ipw.Layout(width='200px'))
 
         # Final orientation inputs
-        self.params_dhva_freqs_ending_phi = ipw.FloatText(
-            value=self._model.dHvA_frequencies_parameters['ending_phi'],
-            description='φ', layout=ipw.Layout(width='130px'), default_value=90.0
+        self.dhva_ending_phi = ipw.FloatText(
+            value=self._model.dhva_ending_phi,
+            description='φ (°)', layout=ipw.Layout(width='130px'), default_value=90.0
             )
-        self.params_dhva_freqs_ending_theta = ipw.FloatText(
-            value=self._model.dHvA_frequencies_parameters['ending_theta'],
-            description='θ', layout=ipw.Layout(width='130px'), default_value=90.0
+        ipw.link(
+            (self._model, 'dhva_ending_phi'),
+            (self.dhva_ending_phi, 'value'),
+        )
+        self.dhva_ending_theta = ipw.FloatText(
+            value=self._model.dhva_ending_theta,
+            description='θ (°)', layout=ipw.Layout(width='130px'), default_value=90.0
             )
-        self.params_dhva_freqs_ending_label = ipw.Text(description='label', placeholder='optional', layout=ipw.Layout(width='200px'))
+        ipw.link(
+            (self._model, 'dhva_ending_theta'),
+            (self.dhva_ending_theta, 'value'),
+        )
+        self.dhva_ending_label = ipw.Text(description='label', placeholder='optional', layout=ipw.Layout(width='200px'))
 
         # Assemble rows
-        self.params_dhva_freqs_first_row = ipw.HBox([
+        self.dhva_first_row = ipw.HBox([
             ipw.Label('Starting magnetic field orientation:', layout=ipw.Layout(width='200px')),
-            self.params_dhva_freqs_starting_phi,
-            self.params_dhva_freqs_starting_theta,
-            self.params_dhva_freqs_starting_label
+            self.dhva_starting_phi,
+            self.dhva_starting_theta,
+            self.dhva_starting_label
         ])
 
-        self.params_dhva_freqs_second_row = ipw.HBox([
+        self.dhva_second_row = ipw.HBox([
             ipw.Label('Final magnetic field orientation:', layout=ipw.Layout(width='200px')),
-            self.params_dhva_freqs_ending_phi,
-            self.params_dhva_freqs_ending_theta,
-            self.params_dhva_freqs_ending_label
+            self.dhva_ending_phi,
+            self.dhva_ending_theta,
+            self.dhva_ending_label
         ])
-        self.params_dhva_freqs_third_row = ipw.IntText(
-            value=self._model.dHvA_frequencies_parameters['num_rotation'],
+        self.dhva_third_row = ipw.IntText(
+            value=self._model.dhva_num_rotation,
             description='Number of rotation steps',
             style={'description_width': 'initial'},
         )
-
+        ipw.link(
+            (self._model, 'dhva_num_rotation'),
+            (self.dhva_third_row, 'value'),
+        )
 
         self.number_of_disproj_max = ipw.IntText(
             value=self._model.number_of_disproj_max,
@@ -349,9 +368,9 @@ class ConfigurationSettingPanel(
             return
         if self.compute_fermi_surface.value and self.compute_dhva_frequencies.value:
             self.params_dhva_freqs_vbox.children = [
-                self.params_dhva_freqs_first_row,
-                self.params_dhva_freqs_second_row,
-                self.params_dhva_freqs_third_row,
+                self.dhva_first_row,
+                self.dhva_second_row,
+                self.dhva_third_row,
             ]
         else:
             self.params_dhva_freqs_vbox.children = []

@@ -24,6 +24,7 @@ def get_builder(codes, structure, parameters, **kwargs):
     compute_fermi_surface=wannier90_parameters.pop('compute_fermi_surface')
     fermi_surface_kpoint_distance=wannier90_parameters.pop('fermi_surface_kpoint_distance', False)
     compute_dhva_frequencies=wannier90_parameters.pop('compute_dhva_frequencies', False)
+    dHvA_frequencies_parameters = wannier90_parameters.pop('dHvA_frequencies_parameters', None)
 
     all_codes = {
                 'pw': codes.get('pw')['code'],
@@ -75,6 +76,7 @@ def get_builder(codes, structure, parameters, **kwargs):
         compute_fermi_surface=compute_fermi_surface,
         fermi_surface_kpoint_distance=fermi_surface_kpoint_distance,
         compute_dhva_frequencies=compute_dhva_frequencies,
+        dHvA_frequencies_parameters=dHvA_frequencies_parameters,
         **kwargs,
     )
     return builder
