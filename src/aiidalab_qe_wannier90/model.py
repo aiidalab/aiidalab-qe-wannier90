@@ -15,6 +15,7 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
     # by default: exclude semicore orbitals in both methods, since these low-energy states correspond
     # to almost flat bands and do not play any role in the chemistry of the materials
     exclude_semicore = tl.Bool(allow_none=True, default_value=True)
+    scan_pdwf_parameter = tl.Bool(allow_none=True, default_value=False)
     plot_wannier_functions = tl.Bool(allow_none=True, default_value=False)
     number_of_disproj_max = tl.Int(allow_none=True, default_value=15)
     number_of_disproj_min = tl.Int(allow_none=True, default_value=2)
