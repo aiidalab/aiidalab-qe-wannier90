@@ -341,8 +341,7 @@ class ConfigurationSettingPanel(
             self.algorithm_description,
             self.projection_selection_widget,
             self.frozen_states_widget,
-            # self.number_of_disproj_max,
-            # self.number_of_disproj_min,
+            self.scan_pdwf_parameter,
         ]
         self.rendered = True
 
