@@ -8,7 +8,9 @@ from aiida_skeaf.workflows import SkeafWorkChain
 from aiida_wannier90_workflows.utils.workflows.builder.setter import set_parallelization
 from aiida_pythonjob.launch import prepare_pythonjob_inputs
 from aiida_pythonjob import PythonJob
-from .utils import process_xsf_files
+from .utils import process_cube_files
+from typing import Any
+
 class QeAppWannier90BandsWorkChain(WorkChain):
     """Workchain to run a bands calculation with Quantum ESPRESSO and Wannier90."""
 
@@ -102,7 +104,7 @@ class QeAppWannier90BandsWorkChain(WorkChain):
 
     def setup(self):
         """Define the current workchain"""
-        pass
+        self.ctx.kwargs = self.inputs.kwargs if 'kwargs' in self.inputs else {}
 
     def run_bands(self):
         """Run the bands workchain"""
@@ -158,6 +160,11 @@ class QeAppWannier90BandsWorkChain(WorkChain):
             overrides = self.inputs.overrides.get('wannier90_bands', {})
         else:
             overrides = {}
+        # set up plotting wannier functions if requested
+        overrides.setdefault('wannier90', {})
+        overrides['wannier90'].setdefault('wannier90', {})
+        overrides['wannier90']['wannier90']['wannier_plot_format'] = 'cube'
+        overrides['wannier90']['wannier90']['bands_plot'] = self.ctx.kwargs.get('plot_wannier_functions', False)
         wannier90_parameters = overrides.pop('wannier90_parameters', {})
         scan_pdwf_parameter = wannier90_parameters.pop('scan_pdwf_parameter', False)
         if scan_pdwf_parameter:
@@ -205,20 +212,17 @@ class QeAppWannier90BandsWorkChain(WorkChain):
             self.report('Optimize workchain completed successfully')
 
     def should_run_generate_isosurface(self):
-        kwargs = self.inputs.kwargs if 'kwargs' in self.inputs else {}
-        return kwargs.get('plot_wannier_functions', False)
+        return self.ctx.kwargs.get('plot_wannier_functions', False)
 
     def generate_isosurface(self):
         """Plot the results"""
+        from aiida_pythonjob import spec
 
         workchain = self.ctx['wannier90_bands']
         inputs = prepare_pythonjob_inputs(
-            process_xsf_files,
+            process_cube_files,
             code = self.inputs.codes['python'],
-            output_ports=[{'name': 'atoms'},
-                      {'name': 'parameters'},
-                      {'name': 'mesh_data', 'identifier': 'namespace'},
-                      ],
+            outputs_spec=spec.namespace(atoms=Any, parameters=dict, mesh_data=spec.dynamic(Any)),
             parent_folder=workchain.outputs.wannier90_plot.remote_folder,
             computer=workchain.inputs.wannier90.wannier90.code.computer,
             register_pickle_by_value=True,
@@ -241,8 +245,7 @@ class QeAppWannier90BandsWorkChain(WorkChain):
             self.report('Plot wf completed successfully')
 
     def should_run_skeaf(self):
-        kwargs = self.inputs.kwargs if 'kwargs' in self.inputs else {}
-        return kwargs.get('compute_dhva_frequencies', False)
+        return self.ctx.kwargs.get('compute_dhva_frequencies', False)
 
     def run_skeaf(self):
         """Run the `SkeafWorkChain` to compute the dHvA frequencies"""
