@@ -6,7 +6,6 @@ from aiida_wannier90_workflows.workflows.optimize import Wannier90OptimizeWorkCh
 from aiida_quantumespresso.workflows.pw.bands import PwBandsWorkChain
 from aiida_skeaf.workflows import SkeafWorkChain
 from aiida_wannier90_workflows.utils.workflows.builder.setter import set_parallelization
-from .utils import process_xsf_files
 class QeAppWannier90BandsWorkChain(WorkChain):
     """Workchain to run a bands calculation with Quantum ESPRESSO and Wannier90."""
 
