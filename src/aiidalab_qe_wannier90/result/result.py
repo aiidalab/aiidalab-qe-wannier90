@@ -11,6 +11,7 @@ import plotly.express as px
 from weas_widget import WeasWidget
 import ast
 import numpy as np
+from ..utils import process_xsf_files
 
 # Define a threshold for considering atoms "almost equally distant"
 DISTANCE_THRESHOLD = 0.01
@@ -134,12 +135,12 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         self.structure_viewer.avr.boundary = [[-0.05, 1.05], [-0.05, 1.05], [-0.05, 1.05]]
 
         # Isosurface
-        self.isosurface_data = self._model.get_isosurface() or {'parameters': {}, 'mesh_data': {}}
+        self.isosurface_data = None
 
         structure_viewer_section = ipw.VBox([
             ipw.HTML('<h3>Structure</h3>'),
             self.structure_viewer,
-        ], layout=ipw.Layout(width='50%', margin='10px 0'))
+        ], layout=ipw.Layout(width='80%', margin='10px 0'))
 
         # Wannier centers and spreads table
         self.table = TableWidget(style={'margin-top': '10px'})
@@ -149,13 +150,13 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         )
         self.table.observe(self.on_single_row_select, 'selectedRowId')
         self.table_description = ipw.HTML(
-            'Click on a table row to visualize on the right the corresponding Wannier function in real space.'
+            'Click on a table row to visualize on the bottom the corresponding Wannier function in real space.'
         )
         table_section = ipw.VBox([
             ipw.HTML('<h3>Wannier centers and spreads</h3>'),
             self.table_description,
             self.table
-        ], layout=ipw.Layout(width='50%', margin='10px 0'))
+        ])
 
         self.skeaf_container = ipw.VBox([
             ipw.HTML('<h2>Fermi surface</h2>'),
@@ -196,7 +197,8 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
                 wannier90_outputs_parameters,
                 bands_distance_warning_widget if show_bands_distance_warning else ipw.HTML(''),
                 ipw.HBox([self.plot_omega_is, self.plot_omega_tots]),
-                ipw.HBox([structure_viewer_section, table_section]),
+                table_section,
+                structure_viewer_section,
             ]),
             self.skeaf_container,
             ipw.VBox([
@@ -204,6 +206,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
                 ipw.VBox(download_links),
             ]),
         ]
+
 
     def on_single_row_select(self, change):
         id = change.get('new')
@@ -232,14 +235,20 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         key = f'aiida_{int(id):05d}'
         data = []
 
+        root = self._model.fetch_process_node()
+        retrieved = root.outputs.wannier90.wannier90_bands.wannier90_plot.retrieved
+
+        if not self.isosurface_data:
+            self.isosurface_data = process_xsf_files(folder=retrieved)
+
         params = self.isosurface_data.get('parameters', {})
         mesh = self.isosurface_data.get('mesh_data', {})
 
         if key in params and 'isovalue' in params[key]:
             for item in ['positive', 'negative']:
                 try:
-                    vertices = mesh[f'{key}_{item}_vertices'].value.tolist()
-                    faces = mesh[f'{key}_{item}_faces'].value.tolist()
+                    vertices = mesh[f'{key}_{item}_vertices'].tolist()
+                    faces = mesh[f'{key}_{item}_faces'].tolist()
                 except KeyError:
                     continue
                 data.append({

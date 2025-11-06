@@ -1,11 +1,14 @@
-def process_xsf_files(folder: str = 'parent_folder'):
-    import os
+from aiida import orm
+
+def process_xsf_files(folder: orm.FolderData) -> dict:
     import numpy as np
     from ase.io import read
     from skimage import measure
 
-    def read_xsf_density(filename):
-        with open(filename, 'r') as f:
+    def read_xsf_density(folder: orm.FolderData, filename: str):
+        from ase.io import read
+        with folder.open(filename, 'r') as f:
+            atoms = read(f, format='xsf')
             lines = f.readlines()
         for i, line in enumerate(lines):
             if 'BEGIN_DATAGRID_3D' in line:
@@ -24,7 +27,7 @@ def process_xsf_files(folder: str = 'parent_folder'):
         if actual_size != expected_size:
             raise ValueError(f'Mismatch in density data size: expected {expected_size}, got {actual_size}')
         density_array = np.array(density_data).reshape((nz, ny, nx), order='F')
-        return nx, ny, nz, origin, lattice_vectors, density_array
+        return atoms, nx, ny, nz, origin, lattice_vectors, density_array
 
     def find_isovalue(density_array, percentile=90):
         """Find the isovalue for the isosurface by taking the 90th percentile of the density values """
@@ -41,13 +44,11 @@ def process_xsf_files(folder: str = 'parent_folder'):
 
     parameters = {}
     mesh_data = {}
-    for filename in os.listdir(folder):
+    for filename in folder.list_object_names():
         if filename.endswith('.xsf'):
-            filepath = os.path.join(folder, filename)
-            atoms = read(filepath)
-            key = filename[:-4]
             try:
-                nx, ny, nz, origin, lattice_vectors, density_array = read_xsf_density(filepath)
+                key = filename[:-4]
+                atoms, nx, ny, nz, origin, lattice_vectors, density_array = read_xsf_density(folder, filename)
                 isovalue = abs(find_isovalue(density_array))
                 verts, faces = compute_isosurface(density_array, isovalue, origin, lattice_vectors)
                 verts_neg, faces_neg = compute_isosurface(density_array, -isovalue, origin, lattice_vectors)
