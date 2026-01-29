@@ -172,7 +172,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         self.root_process_node = self._model.process
         self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90_plot.retrieved
         filename = f'aiida_{int(1):05d}.xsf'
-        self.download_xsf = ipw.HTML('No wannier function are selected for download.')
+        self.download_xsf = ipw.HTML('No Wannier function selected for download.')
         # Isosurface
         self.isosurface_data = {}
         structure_viewer_section = ipw.VBox([
@@ -187,7 +187,6 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
             ),
             self.isovalue,
             ipw.HBox([self.supercell_label, self.supercell_a, self.supercell_b, self.supercell_c]),
-            self.download_xsf,
             self.structure_viewer,
         ],
         layout=ipw.Layout(width='80%', margin='10px 0')
@@ -224,18 +223,60 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
             self.skeaf_container.layout.display = 'none'
 
         # Downloads section
-        download_links = []
+        tb_links = []
+        wsvec_links = []
+        fermi_links = []
         for filename in self._model.retrieved.list_object_names():
             if filename.endswith('_tb.dat'):
-                temp_dir = self._model.retrieved
-                download_links.append(create_download_link(
-                    temp_dir, filename, description=f'Download the tight-binding model {filename}'
+                tb_links.append(create_download_link(
+                    self._model.retrieved,
+                    filename,
+                    description='Download tight-binding model (_tb.dat Wannier90 format)',
+                ))
+            elif filename.endswith('_wsvec.dat'):
+                wsvec_links.append(create_download_link(
+                    self._model.retrieved,
+                    filename,
+                    description='Download Wigner-Seitz cell information (_wsvec.dat Wannier90 format)',
                 ))
             elif filename.endswith('.bxsf'):
-                temp_dir = self._model.retrieved
-                download_links.append(create_download_link(
-                    temp_dir, filename, description=f'Download the Fermi surface {filename}'
+                fermi_links.append(create_download_link(
+                    self._model.retrieved,
+                    filename,
+                    description=f'Download Fermi surface ({filename})',
                 ))
+
+        download_section_items = [
+            ipw.HTML('<h2>Download files</h2>'),
+            ipw.HTML('<h3>Real-space Wannier functions</h3>'),
+            self.download_xsf,
+            ipw.HTML(
+                '<div style="font-size: 13px; color: #555; margin: 6px 0 14px;">'
+                'Select a Wannier function in the table above to enable its download.'
+                '<br>If you want to download all WFs together, go to the main results section, '
+                'open the "Summary" tab, and use "Download the data".'
+                '</div>'
+            ),
+        ]
+        if tb_links:
+            download_section_items += [
+                ipw.HTML('<h3>Hamiltonian in WF representation</h3>'),
+                ipw.VBox(tb_links),
+            ]
+        if wsvec_links:
+            download_section_items += [
+                ipw.HTML(
+                    '<div style="font-size: 13px; color: #555; margin-top: 6px;">'
+                    'When using the tight-binding model, you may also need the following file:'
+                    '</div>'
+                ),
+                ipw.VBox(wsvec_links),
+            ]
+        if fermi_links:
+            download_section_items += [
+                ipw.HTML('<h3>Fermi surface</h3>'),
+                ipw.VBox(fermi_links),
+            ]
 
         # Arrange components in the panel
         self.children = [
@@ -252,10 +293,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
                 structure_viewer_section,
             ]),
             self.skeaf_container,
-            ipw.VBox([
-                ipw.HTML('<h2>Download files</h2>'),
-                ipw.VBox(download_links),
-            ]),
+            ipw.VBox(download_section_items),
         ]
 
 
@@ -267,7 +305,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         self._plot_wannier_function()
         self.download_xsf.value = create_download_link(
             self.wannier90_plot_retrieved, f'aiida_{int(id):05d}.xsf',
-            description=f'Download the Wannier function xsf file for WF id={id}'
+            description=f'Download real-space WF #{id} (XSF format)',
         ).value
 
     def _plot_wannier_function(self, isovalue=None):
