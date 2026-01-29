@@ -48,7 +48,7 @@ class ConfigurationSettingPanel(
         # Workflow explanation
         workflow_explanation = ipw.HTML(
             """<details style="margin-bottom: 10px;">
-            <summary style="font-weight: bold;">📘 Workflow Overview</summary>
+            <summary title="Click to expand" style="font-weight: 600; cursor: pointer;">▶ Workflow overview</summary>
             <div style="padding-left: 10px; margin-top: 5px;">
             This workflow consists of two main steps:
             <ul>
@@ -60,10 +60,12 @@ class ConfigurationSettingPanel(
         )
 
 
+        checkbox_layout = ipw.Layout(width='fit-content', margin='4px 2px')
         self.exclude_semicore = ipw.Checkbox(
             value=self._model.exclude_semicore,
             description='Exclude semicore states',
-            style={'description_width': 'initial'},
+            indent=False,
+            layout=checkbox_layout,
         )
         ipw.link(
             (self._model, 'exclude_semicore'),
@@ -72,7 +74,8 @@ class ConfigurationSettingPanel(
         self.retrieve_hamiltonian = ipw.Checkbox(
             value=self._model.retrieve_hamiltonian,
             description="Retrieve real-space Hamiltonian ('.tb' file)",
-            style={'description_width': 'initial'},
+            indent=False,
+            layout=checkbox_layout,
         )
         ipw.link(
             (self._model, 'retrieve_hamiltonian'),
@@ -81,7 +84,8 @@ class ConfigurationSettingPanel(
         self.retrieve_matrices = ipw.Checkbox(
             value=self._model.retrieve_matrices,
             description='Retrieve ".amn", ".mmn", ".eig", ".chk" and ".spn" files)',
-            style={'description_width': 'initial'},
+            indent=False,
+            layout=checkbox_layout,
         )
         ipw.link(
             (self._model, 'retrieve_matrices'),
@@ -90,7 +94,7 @@ class ConfigurationSettingPanel(
         self.scan_pdwf_parameter = ipw.Checkbox(
             value=self._model.scan_pdwf_parameter,
             description='Exhaustive PDWF parameter scan',
-            style={'description_width': 'initial'},
+            indent=False,
             tooltip='If enabled, an exhaustive scan of the PDWF thresholds is ' \
             'performed (up to 30 Wannierizations) to find those that bring the ' \
             'bands distance (for bands up to 2 eV above the Fermi level) below 10 meV.',
@@ -102,7 +106,8 @@ class ConfigurationSettingPanel(
         self.plot_wannier_functions = ipw.Checkbox(
             value=self._model.plot_wannier_functions,
             description='Compute real-space Wannier functions',
-            style={'description_width': 'initial'},
+            indent=False,
+            layout=checkbox_layout,
         )
         ipw.link(
             (self._model, 'plot_wannier_functions'),
@@ -111,7 +116,8 @@ class ConfigurationSettingPanel(
         self.compute_fermi_surface = ipw.Checkbox(
             value = self._model.compute_fermi_surface,
             description='Compute Fermi surface',
-            style={'description_width': 'initial'},
+            indent=False,
+            layout=checkbox_layout,
         )
         ipw.link(
             (self._model, 'compute_fermi_surface'),
@@ -120,8 +126,8 @@ class ConfigurationSettingPanel(
         self.fermi_surface_kpoint_distance = ipw.FloatText(
             value=self._model.fermi_surface_kpoint_distance,
             description=r'Fermi surface k-point distance (Å$^{-1}$)',
-            style={'description_width': 'initial'},
-            layout=ipw.Layout(margin='0 0 0 30px'),
+            style={'description_width': '150px'},
+            layout=ipw.Layout(margin='0 0 0 24px'),
         )
         ipw.link(
             (self._model, 'fermi_surface_kpoint_distance'),
@@ -130,7 +136,7 @@ class ConfigurationSettingPanel(
         self.compute_dhva_frequencies = ipw.Checkbox(
             value=self._model.compute_dhva_frequencies,
             description='Compute de Haas-van Alphen frequencies',
-            style={'description_width': 'initial'},
+            indent=False,
             layout=ipw.Layout(margin='0 0 0 20px'),
         )
         ipw.link(
@@ -138,44 +144,67 @@ class ConfigurationSettingPanel(
             (self.compute_dhva_frequencies, 'value'),
         )
         self.params_fermi_surface_vbox = ipw.VBox([])
-        self.params_dhva_freqs_vbox = ipw.VBox([], layout=ipw.Layout(margin='0 0 0 40px'))
+        self.params_dhva_freqs_vbox = ipw.VBox(
+            [],
+            layout=ipw.Layout(margin='0 0 0 40px'),
+        )
 
         self.dhva_starting_phi = ipw.FloatText(
             value=self._model.dhva_starting_phi,
-            description='φ (°)', layout=ipw.Layout(width='130px')
-            )
+            description='φ (°)',
+            layout=ipw.Layout(width='130px'),
+            style={'description_width': '60px'},
+        )
         ipw.link(
             (self._model, 'dhva_starting_phi'),
             (self.dhva_starting_phi, 'value'),
         )
         self.dhva_starting_theta = ipw.FloatText(
             value=self._model.dhva_starting_theta,
-            description='θ (°)', layout=ipw.Layout(width='130px')
-            )
+            description='θ (°)',
+            layout=ipw.Layout(width='130px'),
+            style={'description_width': '60px'},
+        )
         ipw.link(
             (self._model, 'dhva_starting_theta'),
             (self.dhva_starting_theta, 'value'),
         )
-        self.dhva_starting_label = ipw.Text(description='label', placeholder='optional', layout=ipw.Layout(width='200px'))
+        self.dhva_starting_label = ipw.Text(
+            description='Label',
+            placeholder='optional',
+            layout=ipw.Layout(width='200px'),
+            style={'description_width': '50px'},
+        )
 
         # Final orientation inputs
         self.dhva_ending_phi = ipw.FloatText(
             value=self._model.dhva_ending_phi,
-            description='φ (°)', layout=ipw.Layout(width='130px'), default_value=90.0
-            )
+            description='φ (°)',
+            layout=ipw.Layout(width='130px'),
+            default_value=90.0,
+            style={'description_width': '60px'},
+        )
         ipw.link(
             (self._model, 'dhva_ending_phi'),
             (self.dhva_ending_phi, 'value'),
         )
         self.dhva_ending_theta = ipw.FloatText(
             value=self._model.dhva_ending_theta,
-            description='θ (°)', layout=ipw.Layout(width='130px'), default_value=90.0
-            )
+            description='θ (°)',
+            layout=ipw.Layout(width='130px'),
+            default_value=90.0,
+            style={'description_width': '60px'},
+        )
         ipw.link(
             (self._model, 'dhva_ending_theta'),
             (self.dhva_ending_theta, 'value'),
         )
-        self.dhva_ending_label = ipw.Text(description='label', placeholder='optional', layout=ipw.Layout(width='200px'))
+        self.dhva_ending_label = ipw.Text(
+            description='Label',
+            placeholder='optional',
+            layout=ipw.Layout(width='200px'),
+            style={'description_width': '50px'},
+        )
 
         # Assemble rows
         self.dhva_first_row = ipw.HBox([
@@ -194,7 +223,7 @@ class ConfigurationSettingPanel(
         self.dhva_third_row = ipw.IntText(
             value=self._model.dhva_num_rotation,
             description='Number of rotation steps',
-            style={'description_width': 'initial'},
+            style={'description_width': '150px'},
         )
         ipw.link(
             (self._model, 'dhva_num_rotation'),
@@ -204,7 +233,7 @@ class ConfigurationSettingPanel(
         self.number_of_disproj_max = ipw.IntText(
             value=self._model.number_of_disproj_max,
             description='Number of dis_proj_max',
-            style={'description_width': 'initial'},
+            style={'description_width': '150px'},
         )
         ipw.link(
             (self._model, 'number_of_disproj_max'),
@@ -213,7 +242,7 @@ class ConfigurationSettingPanel(
         self.number_of_disproj_min = ipw.IntText(
             value=self._model.number_of_disproj_min,
             description='Number of dis_proj_min',
-            style={'description_width': 'initial'},
+            style={'description_width': '150px'},
         )
         ipw.link(
             (self._model, 'number_of_disproj_min'),
@@ -222,7 +251,7 @@ class ConfigurationSettingPanel(
         # ---------------------------------------------------------------------------
         self.algorithm_description = ipw.HTML(
             """<details style="margin-bottom: 10px;">
-            <summary style="font-weight: bold;">📘 Automated Wannierization algorithm</summary>
+            <summary title="Click to expand" style="font-weight: 600; cursor: pointer;">▶ Automated wannierization algorithm</summary>
             You can select some variants of the automated Wannierization algorithm.
             The recommended choice is to use the PDWF algorithm described in
             <a href="https://www.nature.com/articles/s41524-023-01146-w" target="_blank">[J. Qiao, G. Pizzi, N. Marzari, … (2023)]</a>:
@@ -231,34 +260,24 @@ class ConfigurationSettingPanel(
             </details>
             """
         )
-        self.projection_description = ipw.HTML(
-            """<details style="margin-bottom: 10px;">
-            <summary style="font-weight: bold;">📘 Starting projections</summary>
-            <ul>
-                <li><b>Pseudoatomic orbitals from pseudopotential (PDWF method)</b> (recommended)</li>
-                <li><b>Selected columns of the density matrix (SCDM)</b></li>
-            </ul>
-            </details>
-            """
-        )
+
 
         # Dropdown for Projection Type
         self.projection_type = ipw.Dropdown(
             options=[
-                ('Pseudoatomic orbitals from pseudopotential (PDWF method)', 'atomic_projectors_qe'),
+                (
+                    'Pseudoatomic orbitals from pseudopotential (PDWF method) (recommended)',
+                    'atomic_projectors_qe',
+                ),
                 ('Selected columns of the density matrix (SCDM)', 'SCDM'),
                 # ('Analytical hydrogenic rbitals', 'analytic'),  # Hidden for now
             ],
             value='atomic_projectors_qe',
             description='Starting projections:',
             style={'description_width': 'initial'},
+            layout=ipw.Layout(width='700px'),
         )
 
-        # Layout the widgets
-        self.projection_selection_widget = ipw.VBox([
-            self.projection_description,
-            self.projection_type
-        ])
 
         ipw.link(
             (self._model, 'projection_type'),
@@ -268,7 +287,7 @@ class ConfigurationSettingPanel(
         # Description HTML
         self.description_html = ipw.HTML(
             """<details style="margin-bottom: 10px;">
-            <summary style="font-weight: bold;">📘 Frozen states</summary>
+            <summary title="Click to expand" style="font-weight: 600; cursor: pointer;">▶ Frozen states</summary>
             <ul>
                 <li><b>Projectability + energy window</b> (recommended, PDWF method
                 <a href="o" target="_blank">[Junfeng’s paper]</a>)
@@ -291,18 +310,24 @@ class ConfigurationSettingPanel(
             value='fixed_plus_projectability',
             description='Frozen states:',
             style={'description_width': 'initial'},
+            layout=ipw.Layout(width='500px'),
         )
 
         # Energy Window Input (default 2 eV)
         self.energy_window_label = ipw.HTML(
-            'Energy window upper limit (eV above <b>E<sub>F</sub></b>):'
+            'Energy window upper limit (eV above <b>E<sub>F</sub></b>):',
+            layout=ipw.Layout(margin='0 8px 0 0'),
         )
 
-        self.energy_window_input = ipw.FloatText(value=2.0,
-                                                    description='',
-                                                    layout=ipw.Layout(width='50px'),)
-        self.energy_window_widget = ipw.HBox(children=[self.energy_window_label, self.energy_window_input],
-                                             layout=ipw.Layout(width='100%'))
+        self.energy_window_input = ipw.FloatText(
+            value=2.0,
+            description='',
+            layout=ipw.Layout(width='90px'),
+        )
+        self.energy_window_widget = ipw.HBox(
+            children=[self.energy_window_label, self.energy_window_input],
+            layout=ipw.Layout(width='100%', align_items='center', overflow='visible'),
+        )
 
         # Attach the event listener
         self.frozen_type.observe(self._update_energy_window_visibility, names='value')
@@ -311,15 +336,18 @@ class ConfigurationSettingPanel(
         self._update_energy_window_visibility({'new': self.frozen_type.value})
 
         # Layout the widgets
-        self.frozen_states_widget = ipw.VBox([
-            self.description_html,
-            self.frozen_type,
-            self.energy_window_widget,
-        ])
+        self.frozen_states_widget = ipw.VBox(
+            [
+                self.description_html,
+                self.frozen_type,
+                self.energy_window_widget,
+            ],
+            layout=ipw.Layout(width='100%', align_items='flex-start', overflow='visible'),
+        )
         self.frozen_type = ipw.Dropdown(
             options=['fixed_plus_projectability', 'projectability', 'energy_fixed'],
             value=self._model.frozen_type,
-            description='Frozen states: ',
+            description='Frozen states:',
             style={'description_width': 'initial'},
         )
         ipw.link(
@@ -340,7 +368,7 @@ class ConfigurationSettingPanel(
             self.params_fermi_surface_vbox,
             self.params_dhva_freqs_vbox,
             self.algorithm_description,
-            self.projection_selection_widget,
+            self.projection_type,
             self.frozen_states_widget,
             self.scan_pdwf_parameter,
         ]
@@ -357,7 +385,7 @@ class ConfigurationSettingPanel(
     # Function to toggle the visibility of the energy window input
     def _update_energy_window_visibility(self, change):
         if change['new'] in ['fixed_plus_projectability', 'energy_fixed']:
-            self.energy_window_widget.layout.display = 'block'
+            self.energy_window_widget.layout.display = 'flex'
         else:
             self.energy_window_widget.layout.display = 'none'
 
