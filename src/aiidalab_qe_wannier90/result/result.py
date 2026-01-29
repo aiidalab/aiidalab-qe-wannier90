@@ -142,11 +142,33 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
             continuous_update=False,
         )
         self.isovalue.observe(self._on_isovalue_change, names='value')
-        self.switch_supercell = ipw.Checkbox(
-            value=False,
-            description='Show supercell',
+        self.supercell_label = ipw.HTML('Supercell:')
+        self.supercell_a = ipw.BoundedIntText(
+            value=1,
+            min=1,
+            max=9,
+            step=1,
+            layout=ipw.Layout(width='60px'),
         )
-        self.switch_supercell.observe(self._on_switch_supercell_change, names='value')
+        self.supercell_b = ipw.BoundedIntText(
+            value=1,
+            min=1,
+            max=9,
+            step=1,
+            description='',
+            layout=ipw.Layout(width='60px'),
+        )
+        self.supercell_c = ipw.BoundedIntText(
+            value=1,
+            min=1,
+            max=9,
+            step=1,
+            description='',
+            layout=ipw.Layout(width='60px'),
+        )
+        self.supercell_a.observe(self._on_supercell_size_change, names='value')
+        self.supercell_b.observe(self._on_supercell_size_change, names='value')
+        self.supercell_c.observe(self._on_supercell_size_change, names='value')
         self.root_process_node = self._model.process
         self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90_plot.retrieved
         filename = f'aiida_{int(1):05d}.xsf'
@@ -155,11 +177,21 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         self.isosurface_data = {}
         structure_viewer_section = ipw.VBox([
             ipw.HTML('<h3>Wannier functions in real space</h3>'),
+            ipw.HTML(
+                '<div style="font-size: 13px; color: #555;">'
+                'The supercell view tiles the unit cell to visualize periodicity and the spatial extent '
+                'of Wannier functions. Larger supercells make inter-cell overlap easier to see. '
+                '<br><b>Note:</b> this only tiles the unit cell (crystal); the Wannier functions themselves '
+                'are not recomputed.'
+                '</div>'
+            ),
             self.isovalue,
-            self.switch_supercell,
+            ipw.HBox([self.supercell_label, self.supercell_a, self.supercell_b, self.supercell_c]),
             self.download_xsf,
             self.structure_viewer,
-        ], layout=ipw.Layout(width='80%', margin='10px 0'))
+        ],
+        layout=ipw.Layout(width='80%', margin='10px 0')
+        )
 
         # Wannier centers and spreads table
         self.table = TableWidget(style={'margin-top': '10px'})
@@ -305,11 +337,16 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
             isovalue=change['new']
         )
 
-    def _on_switch_supercell_change(self, change):
-        """Handle supercell switch change event."""
-        if change['new']:
-            self.structure_viewer.avr.boundary = [[-1.05, 2.05], [-1.05, 2.05], [-1.05, 2.05]]
-        else:
-            self.structure_viewer.avr.boundary = [[-0.05, 1.05], [-0.05, 1.05], [-0.05, 1.05]]
-
+    def _on_supercell_size_change(self, change):
+        """Handle supercell size change event."""
+        self._update_supercell_boundary()
         self.structure_viewer.avr.draw()
+
+    def _update_supercell_boundary(self):
+        """Update the structure viewer boundary based on the supercell size."""
+        sizes = (self.supercell_a.value, self.supercell_b.value, self.supercell_c.value)
+        bounds = []
+        for size in sizes:
+            half = (size - 1) / 2
+            bounds.append([-half - 0.05, half + 1.05])
+        self.structure_viewer.avr.boundary = bounds
