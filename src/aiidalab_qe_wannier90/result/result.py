@@ -147,7 +147,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
             description='Show supercell',
         )
         self.switch_supercell.observe(self._on_switch_supercell_change, names='value')
-        self.root_process_node = self._model.fetch_process_node()
+        self.root_process_node = self._model.process
         self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90_plot.retrieved
         filename = f'aiida_{int(1):05d}.xsf'
         self.download_xsf = ipw.HTML('No wannier function are selected for download.')
