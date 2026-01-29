@@ -73,7 +73,7 @@ class ConfigurationSettingPanel(
         )
         self.retrieve_hamiltonian = ipw.Checkbox(
             value=self._model.retrieve_hamiltonian,
-            description="Retrieve real-space Hamiltonian ('.tb' file)",
+            description="Retrieve Hamiltonian '_tb.dat' file",
             indent=False,
             layout=checkbox_layout,
         )
@@ -83,7 +83,7 @@ class ConfigurationSettingPanel(
         )
         self.retrieve_matrices = ipw.Checkbox(
             value=self._model.retrieve_matrices,
-            description='Retrieve ".amn", ".mmn", ".eig", ".chk" and ".spn" files)',
+            description="Retrieve major input/output files: 'amn', 'mmn', 'eig', 'chk', 'spn' (if present)",
             indent=False,
             layout=checkbox_layout,
         )
@@ -93,7 +93,7 @@ class ConfigurationSettingPanel(
         )
         self.scan_pdwf_parameter = ipw.Checkbox(
             value=self._model.scan_pdwf_parameter,
-            description='Exhaustive PDWF parameter scan',
+            description='Optimize PDWF thresholds',
             indent=False,
             tooltip='If enabled, an exhaustive scan of the PDWF thresholds is ' \
             'performed (up to 30 Wannierizations) to find those that bring the ' \
@@ -251,7 +251,7 @@ class ConfigurationSettingPanel(
         # ---------------------------------------------------------------------------
         self.algorithm_description = ipw.HTML(
             """<details style="margin-bottom: 10px;">
-            <summary title="Click to expand" style="font-weight: 600; cursor: pointer;">▶ Automated wannierization algorithm</summary>
+            <summary title="Click to expand" style="font-weight: 600; cursor: pointer;">▶ Automated Wannierization algorithm</summary>
             You can select some variants of the automated Wannierization algorithm.
             The recommended choice is to use the PDWF algorithm described in
             <a href="https://www.nature.com/articles/s41524-023-01146-w" target="_blank">[J. Qiao, G. Pizzi, N. Marzari, … (2023)]</a>:
@@ -289,12 +289,12 @@ class ConfigurationSettingPanel(
             """<details style="margin-bottom: 10px;">
             <summary title="Click to expand" style="font-weight: 600; cursor: pointer;">▶ Frozen states</summary>
             <ul>
-                <li><b>Projectability + energy window</b> (recommended, PDWF method
-                <a href="o" target="_blank">[Junfeng’s paper]</a>)
+                <li><b>Projectability + energy window</b> (recommended,
+                <a href="https://www.nature.com/articles/s41524-023-01146-w" target="_blank">[PDWF method]</a>)
                 is a combination of the two methods below (as long as one of the two criteria is satisfied, the state is frozen).</li>
                 <li><b>Projectability only</b> will freeze all states with projectability larger than a threshold value
                 (that is internally optimized by the workflow).</li>
-                <li><b>Energy window only</b> will freeze all states whose energy is smaller or equal than E<sub>F</sub> +
+                <li><b>Energy window only</b> will freeze all states whose energy is smaller than or equal to E<sub>F</sub> +
                 <span id="energy-window-value">2</span> eV, where E<sub>F</sub> is the Fermi level.</li>
             </ul>
             """

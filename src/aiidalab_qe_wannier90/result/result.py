@@ -139,7 +139,9 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
             max=1.0,
             step=0.01,
             description='Isovalue:',
+            style={'description_width': 'initial'},
             continuous_update=False,
+            layout=ipw.Layout(width='320px'),
         )
         self.isovalue.observe(self._on_isovalue_change, names='value')
         self.supercell_label = ipw.HTML('Supercell:')
@@ -177,15 +179,14 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         self.isosurface_data = {}
         structure_viewer_section = ipw.VBox([
             ipw.HTML('<h3>Wannier functions in real space</h3>'),
-            ipw.HTML(
-                '<div style="font-size: 13px; color: #555;">'
-                'The supercell view tiles the unit cell to visualize periodicity and the spatial extent '
-                'of Wannier functions. Larger supercells make inter-cell overlap easier to see. '
-                '<br><b>Note:</b> this only repeats the crystal structure unit cell, the Wannier functions are not repeated here. In principle, the Wannier functions are defined on a supercell whose size is identical to the size of kpoint grid of the nscf calculation. To save computational cost, the real-space Wannier functions (xsf or cube files) are truncations of the original Wannier functions. If you observe some artifacts in the visualization, try increasing the `wannier_plot_supercell` input parameter of wannier90.'
-                '</div>'
-            ),
             self.isovalue,
             ipw.HBox([self.supercell_label, self.supercell_a, self.supercell_b, self.supercell_c]),
+            ipw.HTML(
+                '<div style="font-size: 12px; color: #0b4f6c; background: #e8f4fb; '
+                'border: 1px solid #b8dff0; padding: 8px 10px; border-radius: 6px; line-height: 1.35;">'
+                '<b>Note</b>: This only repeats the crystal structure unit cell, the Wannier functions are not repeated here. In principle, the Wannier functions are defined on a supercell whose size is identical to the size of kpoint grid of the nscf calculation. To save computational cost, the real-space Wannier functions (xsf or cube files) are truncations of the original Wannier functions. If you observe some artifacts in the visualization, try increasing the `wannier_plot_supercell` input parameter of wannier90.'
+                '</div>'
+            ),
             self.structure_viewer,
         ],
         layout=ipw.Layout(width='80%', margin='10px 0')
