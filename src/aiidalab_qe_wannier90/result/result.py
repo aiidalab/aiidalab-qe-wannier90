@@ -181,8 +181,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
                 '<div style="font-size: 13px; color: #555;">'
                 'The supercell view tiles the unit cell to visualize periodicity and the spatial extent '
                 'of Wannier functions. Larger supercells make inter-cell overlap easier to see. '
-                '<br><b>Note:</b> this only tiles the unit cell (crystal); the Wannier functions themselves '
-                'are not recomputed.'
+                '<br><b>Note:</b> this only repeats the crystal structure unit cell, the Wannier functions are not repeated here. In principle, the Wannier functions are defined on a supercell whose size is identical to the size of kpoint grid of the nscf calculation. To save computational cost, the real-space Wannier functions (xsf or cube files) are truncations of the original Wannier functions. If you observe some artifacts in the visualization, try increasing the `wannier_plot_supercell` input parameter of wannier90.'
                 '</div>'
             ),
             self.isovalue,
