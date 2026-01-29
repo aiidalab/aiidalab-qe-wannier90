@@ -377,7 +377,12 @@ class ConfigurationSettingPanel(
     def _on_electronic_type_change(self, change):
         if change['new'] == 'insulator':
             self.error_message.value = """<div style="color: red; font-weight: bold; border: 1px solid red; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-            ⚠️ Electronic type: Insulator setting is not supported yet. You can still use the Metal setting even if your material is an insulator.
+            ⚠️ Wannierization of insulators: the current automated workflow works only when treating the system as a <b>metal</b>
+            (i.e., include some conduction bands). Please set <b>Electronic type</b> to <b>Metal</b> to proceed, otherwise the submission will be blocked.
+            <br><br>
+            Note: A method to extract valence-band-only Wannier functions for insulators exists (MRWF), but is not yet automated in AiiDAlab QE:
+            J. Qiao, G. Pizzi, N. Marzari, <i>Automated mixing of maximally localized Wannier functions into target manifolds</i>,
+            npj Comput. Mater. 9, 206 (2023), <a href="https://doi.org/10.1038/s41524-023-01147-9" target="_blank">doi:10.1038/s41524-023-01147-9</a>.
             </div>"""
         else:
             self.error_message.value = ''
