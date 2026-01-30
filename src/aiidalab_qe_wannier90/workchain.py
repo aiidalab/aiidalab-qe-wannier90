@@ -19,6 +19,7 @@ def get_builder(codes, structure, parameters, **kwargs):
     plot_wannier_functions=wannier90_parameters.pop('plot_wannier_functions')
     retrieve_hamiltonian=wannier90_parameters.pop('retrieve_hamiltonian')
     retrieve_matrices=wannier90_parameters.pop('retrieve_matrices')
+    nscf_kpoints_distance=wannier90_parameters.pop('nscf_kpoints_distance', None)
     projection_type=wannier90_parameters.pop('projection_type')
     frozen_type=wannier90_parameters.pop('frozen_type')
     compute_fermi_surface=wannier90_parameters.pop('compute_fermi_surface')
@@ -52,6 +53,8 @@ def get_builder(codes, structure, parameters, **kwargs):
             'wannier90_parameters': wannier90_parameters,
         },
     }
+    if nscf_kpoints_distance is not None:
+        overrides['wannier90_bands']['nscf']['kpoints_distance'] = nscf_kpoints_distance
     parallelization = {
         'num_machines': codes['pw']['nodes'],
         'num_mpiprocs_per_machine': codes['pw']['ntasks_per_node'],

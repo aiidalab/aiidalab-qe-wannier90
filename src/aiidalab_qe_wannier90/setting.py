@@ -32,12 +32,24 @@ class ConfigurationSettingPanel(
             'electronic_type',
         )
         self._model.observe(
+            self._on_input_structure_change,
+            'structure_uuid',
+        )
+        self._model.observe(
+            self._on_protocol_change,
+            'protocol',
+        )
+        self._model.observe(
             self._on_compute_fermi_surface_change,
             'compute_fermi_surface',
         )
         self._model.observe(
             self._on_compute_dhva_freqs_change,
             'compute_dhva_frequencies',
+        )
+        self._model.observe(
+            self._on_nscf_kpoints_distance_change,
+            'nscf_kpoints_distance',
         )
 
     def render(self):
@@ -112,6 +124,26 @@ class ConfigurationSettingPanel(
         ipw.link(
             (self._model, 'plot_wannier_functions'),
             (self.plot_wannier_functions, 'value'),
+        )
+        self.nscf_kpoints_distance = ipw.BoundedFloatText(
+            min=0.001,
+            step=0.01,
+            description='NSCF K-points distance (1/Å):',
+            style={'description_width': 'initial'},
+        )
+        ipw.link(
+            (self._model, 'nscf_kpoints_distance'),
+            (self.nscf_kpoints_distance, 'value'),
+        )
+        ipw.dlink(
+            (self._model, 'structure_uuid'),
+            (self.nscf_kpoints_distance, 'disabled'),
+            lambda _: not self._model.has_pbc,
+        )
+        self.mesh_grid = ipw.HTML()
+        ipw.dlink(
+            (self._model, 'mesh_grid'),
+            (self.mesh_grid, 'value'),
         )
         self.compute_fermi_surface = ipw.Checkbox(
             value = self._model.compute_fermi_surface,
@@ -371,6 +403,12 @@ class ConfigurationSettingPanel(
             self.projection_type,
             self.frozen_states_widget,
             self.scan_pdwf_parameter,
+            ipw.HBox(
+                children=[
+                    self.nscf_kpoints_distance,
+                    self.mesh_grid,
+                ]
+            ),
         ]
         self.rendered = True
 
@@ -393,6 +431,12 @@ class ConfigurationSettingPanel(
             self.energy_window_widget.layout.display = 'flex'
         else:
             self.energy_window_widget.layout.display = 'none'
+
+    def _on_input_structure_change(self, _):
+        self.refresh(specific='structure')
+
+    def _on_protocol_change(self, _):
+        self.refresh(specific='protocol')
 
     def _on_compute_fermi_surface_change(self, change):
         # Ensure the widget is initialized before accessing it
@@ -419,3 +463,6 @@ class ConfigurationSettingPanel(
             ]
         else:
             self.params_dhva_freqs_vbox.children = []
+
+    def _on_nscf_kpoints_distance_change(self, _):
+        self.refresh(specific='mesh')
