@@ -1,4 +1,11 @@
-def create_download_link(obj, filename, description='Download'):
+def create_download_link(
+    obj,
+    filename,
+    description='Download',
+    as_button=True,
+    icon='⬇️',
+    button_style='',
+):
     """Create a download link for a file in the AiiDA repository using a temporary directory."""
     import base64
     import shutil
@@ -17,7 +24,18 @@ def create_download_link(obj, filename, description='Download'):
 
     # At this point, we no longer need the file; it's encoded.
     payload = f'data:application/octet-stream;base64,{b64}'
-    html = f'<a download="{filename}" href="{payload}" target="_blank">{description}</a>'
+    label = f'{icon} {description}' if icon else description
+    if as_button:
+        style = (
+            'display:inline-block; padding:3px 6px; background:#2f80ed; color:#fff; '
+            'border-radius:2px; text-decoration:none; font-weight:400; font-size:13px; '
+            'border:1px solid #2f80ed;'
+        )
+        if button_style:
+            style = f'{style} {button_style}'
+        html = f'<a download="{filename}" href="{payload}" target="_blank" style="{style}">{label}</a>'
+    else:
+        html = f'<a download="{filename}" href="{payload}" target="_blank">{label}</a>'
     return ipw.HTML(html)
 
 def plot_skeaf(skeaf_data):

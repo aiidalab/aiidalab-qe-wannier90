@@ -37,6 +37,17 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
     protocol = tl.Unicode(allow_none=True)
     electronic_type = tl.Unicode(allow_none=True)
 
+    def _check_blockers(self):
+        if self.electronic_type == 'insulator':
+            return [
+                (
+                    'Wannier90 automated workflows currently require the system to be treated '
+                    'as a metal (include some conduction bands). Please set the electronic type '
+                    'to Metal to proceed.'
+                )
+            ]
+        return []
+
     def get_model_state(self):
         state = {
             'exclude_semicore': self.exclude_semicore,

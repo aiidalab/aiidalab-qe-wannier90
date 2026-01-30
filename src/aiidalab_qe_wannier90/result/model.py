@@ -18,7 +18,7 @@ class Wannier90ResultsModel(ResultsModel):
     _this_process_label = 'QeAppWannier90BandsWorkChain'
 
     def fetch_result(self):
-        root = self.fetch_process_node()
+        root = self.process
         self.structure = root.outputs.wannier90.pw_bands.primitive_structure
         self.bands_distance = root.outputs.wannier90.wannier90_bands.bands_distance.value
         data = root.outputs.wannier90.wannier90_bands.wannier90_optimal.output_parameters.get_dict()

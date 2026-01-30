@@ -139,27 +139,58 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
             max=1.0,
             step=0.01,
             description='Isovalue:',
+            style={'description_width': 'initial'},
             continuous_update=False,
+            layout=ipw.Layout(width='320px'),
         )
         self.isovalue.observe(self._on_isovalue_change, names='value')
-        self.switch_supercell = ipw.Checkbox(
-            value=False,
-            description='Show supercell',
+        self.supercell_label = ipw.HTML('Supercell:')
+        self.supercell_a = ipw.BoundedIntText(
+            value=1,
+            min=1,
+            max=9,
+            step=1,
+            layout=ipw.Layout(width='60px'),
         )
-        self.switch_supercell.observe(self._on_switch_supercell_change, names='value')
-        self.root_process_node = self._model.fetch_process_node()
+        self.supercell_b = ipw.BoundedIntText(
+            value=1,
+            min=1,
+            max=9,
+            step=1,
+            description='',
+            layout=ipw.Layout(width='60px'),
+        )
+        self.supercell_c = ipw.BoundedIntText(
+            value=1,
+            min=1,
+            max=9,
+            step=1,
+            description='',
+            layout=ipw.Layout(width='60px'),
+        )
+        self.supercell_a.observe(self._on_supercell_size_change, names='value')
+        self.supercell_b.observe(self._on_supercell_size_change, names='value')
+        self.supercell_c.observe(self._on_supercell_size_change, names='value')
+        self.root_process_node = self._model.process
         self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90_plot.retrieved
         filename = f'aiida_{int(1):05d}.xsf'
-        self.download_xsf = ipw.HTML('No wannier function are selected for download.')
+        self.download_xsf = ipw.HTML('No Wannier function selected for download.')
         # Isosurface
         self.isosurface_data = {}
         structure_viewer_section = ipw.VBox([
             ipw.HTML('<h3>Wannier functions in real space</h3>'),
             self.isovalue,
-            self.switch_supercell,
-            self.download_xsf,
+            ipw.HBox([self.supercell_label, self.supercell_a, self.supercell_b, self.supercell_c]),
+            ipw.HTML(
+                '<div style="font-size: 12px; color: #0b4f6c; background: #e8f4fb; '
+                'border: 1px solid #b8dff0; padding: 8px 10px; border-radius: 6px; line-height: 1.35;">'
+                '<b>Note</b>: This only repeats the crystal structure unit cell, the Wannier functions are not repeated here. In principle, the Wannier functions are defined on a supercell whose size is identical to the size of kpoint grid of the nscf calculation. To save computational cost, the real-space Wannier functions (xsf or cube files) are truncations of the original Wannier functions. If you observe some artifacts in the visualization, try increasing the `wannier_plot_supercell` input parameter of wannier90.'
+                '</div>'
+            ),
             self.structure_viewer,
-        ], layout=ipw.Layout(width='80%', margin='10px 0'))
+        ],
+        layout=ipw.Layout(width='80%', margin='10px 0')
+        )
 
         # Wannier centers and spreads table
         self.table = TableWidget(style={'margin-top': '10px'})
@@ -192,18 +223,60 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
             self.skeaf_container.layout.display = 'none'
 
         # Downloads section
-        download_links = []
+        tb_links = []
+        wsvec_links = []
+        fermi_links = []
         for filename in self._model.retrieved.list_object_names():
             if filename.endswith('_tb.dat'):
-                temp_dir = self._model.retrieved
-                download_links.append(create_download_link(
-                    temp_dir, filename, description=f'Download the tight-binding model {filename}'
+                tb_links.append(create_download_link(
+                    self._model.retrieved,
+                    filename,
+                    description='Download tight-binding model (_tb.dat Wannier90 format)',
+                ))
+            elif filename.endswith('_wsvec.dat'):
+                wsvec_links.append(create_download_link(
+                    self._model.retrieved,
+                    filename,
+                    description='Download Wigner-Seitz cell information (_wsvec.dat Wannier90 format)',
                 ))
             elif filename.endswith('.bxsf'):
-                temp_dir = self._model.retrieved
-                download_links.append(create_download_link(
-                    temp_dir, filename, description=f'Download the Fermi surface {filename}'
+                fermi_links.append(create_download_link(
+                    self._model.retrieved,
+                    filename,
+                    description=f'Download Fermi surface ({filename})',
                 ))
+
+        download_section_items = [
+            ipw.HTML('<h2>Download files</h2>'),
+            ipw.HTML('<h3>Real-space Wannier functions</h3>'),
+            self.download_xsf,
+            ipw.HTML(
+                '<div style="font-size: 13px; color: #555; margin: 6px 0 14px;">'
+                'Select a Wannier function in the table above to enable its download.'
+                '<br>If you want to download all WFs together, go to the main results section, '
+                'open the "Summary" tab, and use "Download the data".'
+                '</div>'
+            ),
+        ]
+        if tb_links:
+            download_section_items += [
+                ipw.HTML('<h3>Hamiltonian in WF representation</h3>'),
+                ipw.VBox(tb_links),
+            ]
+        if wsvec_links:
+            download_section_items += [
+                ipw.HTML(
+                    '<div style="font-size: 13px; color: #555; margin-top: 6px;">'
+                    'When using the tight-binding model, you may also need the following file:'
+                    '</div>'
+                ),
+                ipw.VBox(wsvec_links),
+            ]
+        if fermi_links:
+            download_section_items += [
+                ipw.HTML('<h3>Fermi surface</h3>'),
+                ipw.VBox(fermi_links),
+            ]
 
         # Arrange components in the panel
         self.children = [
@@ -220,10 +293,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
                 structure_viewer_section,
             ]),
             self.skeaf_container,
-            ipw.VBox([
-                ipw.HTML('<h2>Download files</h2>'),
-                ipw.VBox(download_links),
-            ]),
+            ipw.VBox(download_section_items),
         ]
 
 
@@ -235,7 +305,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         self._plot_wannier_function()
         self.download_xsf.value = create_download_link(
             self.wannier90_plot_retrieved, f'aiida_{int(id):05d}.xsf',
-            description=f'Download the Wannier function xsf file for WF id={id}'
+            description=f'Download real-space WF #{id} (XSF format)',
         ).value
 
     def _plot_wannier_function(self, isovalue=None):
@@ -305,11 +375,16 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
             isovalue=change['new']
         )
 
-    def _on_switch_supercell_change(self, change):
-        """Handle supercell switch change event."""
-        if change['new']:
-            self.structure_viewer.avr.boundary = [[-1.05, 2.05], [-1.05, 2.05], [-1.05, 2.05]]
-        else:
-            self.structure_viewer.avr.boundary = [[-0.05, 1.05], [-0.05, 1.05], [-0.05, 1.05]]
-
+    def _on_supercell_size_change(self, change):
+        """Handle supercell size change event."""
+        self._update_supercell_boundary()
         self.structure_viewer.avr.draw()
+
+    def _update_supercell_boundary(self):
+        """Update the structure viewer boundary based on the supercell size."""
+        sizes = (self.supercell_a.value, self.supercell_b.value, self.supercell_c.value)
+        bounds = []
+        for size in sizes:
+            half = (size - 1) / 2
+            bounds.append([-half - 0.05, half + 1.05])
+        self.structure_viewer.avr.boundary = bounds
