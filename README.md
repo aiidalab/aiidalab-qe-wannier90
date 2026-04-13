@@ -74,3 +74,9 @@ Run the fowlling command to create the `pythonjob` code in your AiiDA profile:
 ```
 verdi code create core.code.installed --config pythonjob-code.yaml
 ```
+## Cite
+If you use the AiiDAlab QE app in your work, please cite:
+
+Wang, X., Bainglass, E., Bonacci, M., Ortega-Guerrero, A. et al.\
+Making atomistic materials calculations accessible with the AiiDAlab Quantum ESPRESSO app\
+_npj. Comput. Mater._ **12**, 72 (2026). https://doi.org/10.1038/s41524-025-01936-4
