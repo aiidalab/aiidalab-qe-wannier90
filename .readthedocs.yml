@@ -11,6 +11,8 @@ build:
     - python -m pip install --exists-action=w --no-cache-dir -r docs/requirements.txt
     - rabbitmq-server -detached
     - sleep 5
+    - rabbitmqctl start_app
+    - sleep 5
     - rabbitmq-diagnostics status
     - verdi presto
     - verdi daemon start
