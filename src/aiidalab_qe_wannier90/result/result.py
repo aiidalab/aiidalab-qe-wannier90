@@ -13,6 +13,8 @@ import ast
 import numpy as np
 from ..utils import process_xsf_file
 
+from aiidalab_qe.common.infobox import InAppGuide
+
 # Define a threshold for considering atoms "almost equally distant"
 DISTANCE_THRESHOLD = 0.01
 BAND_DISTANCE_WARNING_MEV = 10.0  # show warning if distance exceeds this threshold (in meV)
@@ -286,20 +288,25 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
 
         # Arrange components in the panel
         self.children = [
+            InAppGuide(identifier='wannier90-results'),
             ipw.VBox([
                 ipw.HTML('<h2>DFT and Wannier-interpolated electronic band structure</h2>'),
+                InAppGuide(identifier='wannier90-band-results'),
                 bands_widget,
             ]),
             ipw.VBox([
                 ipw.HTML('<h2>Wannierization details</h2>'),
+                InAppGuide(identifier='wannierization-details'),
                 wannier90_outputs_parameters,
                 bands_distance_warning_widget if show_bands_distance_warning else ipw.HTML(''),
                 ipw.HBox([self.plot_omega_is, self.plot_omega_tots]),
+                InAppGuide(identifier='wannier90-centers-spreads'),
                 table_section,
                 structure_viewer_section,
             ]),
             self.skeaf_container,
-            ipw.VBox(download_section_items),
+            InAppGuide(identifier='wannier90-download'),
+            ipw.VBox(download_section_items)
         ]
 
 
