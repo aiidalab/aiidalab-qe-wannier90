@@ -28,8 +28,8 @@ wannier90 = {
         'panel': Wannier90ResultsPanel,
         'model': Wannier90ResultsModel,
     },
-    "guides": {
-        "title": "Wannier functions",
-        "path": Path(__file__).resolve().parent / "guides",
+    'guides': {
+        'title': 'Wannier functions',
+        'path': Path(__file__).resolve().parent / 'guides',
     },
 }

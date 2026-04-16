@@ -219,6 +219,7 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         self.skeaf_container = ipw.VBox([
             ipw.HTML('<h2>Fermi surface</h2>'),
             ipw.HTML('<h3>de Haas van Alphen (dHva) frequencies</h3>'),
+            InAppGuide(identifier='dHvA-results'),
         ])
 
         # de Haas van Alphen (dHvA) frequencies
