@@ -172,7 +172,10 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         self.supercell_b.observe(self._on_supercell_size_change, names='value')
         self.supercell_c.observe(self._on_supercell_size_change, names='value')
         self.root_process_node = self._model.process
-        self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90_plot.retrieved
+        try:
+            self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90_plot.retrieved
+        except AttributeError:
+            self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90_optimal.retrieved
         filename = f'aiida_{int(1):05d}.xsf'
         self.download_xsf = ipw.HTML('No Wannier function selected for download.')
         # Isosurface
