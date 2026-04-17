@@ -27,6 +27,17 @@ class ConfigurationSettingPanel(
             </div>"""
         )
 
+        self.warning_message_pdwf = ipw.HTML(
+            """<div class="alert alert-warning">
+                <b>Note:</b> In some cases, in particular for single element systems,
+                PDWF method is known to give lower quality interpolation due to lack of pseudo-atomic orbitals
+                to reproduce the electronic structure up to 2 eV above the Fermi level.
+                Recently, the robustness of the PDWF method has been improved by extending the set of initial projections
+                with hydrojenic orbitals, as described in Y. Jiang et al. <i>npj. Comput. Mater.</i> <b>11</b>, 353 (2025).
+                The work is in progress to integrate these improvements in the app.
+            </div>"""
+        )
+
         self._model.observe(
             self._on_electronic_type_change,
             'electronic_type',
@@ -371,6 +382,7 @@ class ConfigurationSettingPanel(
             self.params_dhva_freqs_vbox,
             self.algorithm_description,
             self.projection_type,
+            self.warning_message_pdwf,
             self.frozen_states_widget,
             self.scan_pdwf_parameter,
         ]
