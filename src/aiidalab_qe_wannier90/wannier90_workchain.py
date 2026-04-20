@@ -162,7 +162,7 @@ class QeAppWannier90BandsWorkChain(WorkChain):
         else:
             number_of_disproj_max = 1
             number_of_disproj_min = 1
-        kwargs_filtered = {k: v for k, v in self.inputs.kwargs.items() if k not in ['compute_fermi_surface', 'fermi_surface_kpoint_distance', 'compute_dhva_frequencies','dHvA_frequencies_parameters']}
+        kwargs_filtered = {k: v for k, v in self.inputs.kwargs.items() if k not in ['compute_dhva_frequencies','dHvA_frequencies_parameters']}
         codes = {key: value for key, value in self.inputs.codes.items()}
         builder = Wannier90OptimizeWorkChain.get_builder_from_protocol(
             codes = codes,
