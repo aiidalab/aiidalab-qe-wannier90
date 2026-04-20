@@ -20,21 +20,32 @@ class Wannier90ResultsModel(ResultsModel):
     def fetch_result(self):
         root = self.process
         self.structure = root.outputs.wannier90.pw_bands.primitive_structure
-        self.bands_distance = root.outputs.wannier90.wannier90_bands.bands_distance.value
-        data = root.outputs.wannier90.wannier90_bands.wannier90_optimal.output_parameters.get_dict()
+        bands_outputs = root.outputs.wannier90.wannier90_bands
+        self.bands_distance = bands_outputs.bands_distance.value
+        if 'wannier90_optimal' in bands_outputs:
+            data = bands_outputs.wannier90_optimal.output_parameters.get_dict()
+        else:
+            data = bands_outputs.wannier90.output_parameters.get_dict()
         self.wannier90_outputs = {key: data[key] for key in ['number_wfs', 'Omega_D', 'Omega_I', 'Omega_OD']}
         # Wannier centers/spreads
         self.wannier_centers_spreads = self.get_wannier_centers_spreads(root)
         self.omega_is, self.omega_tots = self.get_omega(root)
-        if 'wannier90_plot' in root.outputs.wannier90.wannier90_bands:
-            self.retrieved = root.outputs.wannier90.wannier90_bands.wannier90_plot.retrieved
+        if 'wannier90_plot' in bands_outputs:
+            self.retrieved = bands_outputs.wannier90_plot.retrieved
+        elif 'wannier90_optimal' in bands_outputs:
+            self.retrieved = bands_outputs.wannier90_optimal.retrieved
         else:
-            self.retrieved = root.outputs.wannier90.wannier90_bands.wannier90_optimal.retrieved
+            self.retrieved = bands_outputs.wannier90.retrieved
 
     def get_omega(self, root):
         omega_is = []
         omega_tots = []
-        with root.outputs.wannier90.wannier90_bands.wannier90_optimal.retrieved.open('aiida.wout') as f:
+        bands_outputs = root.outputs.wannier90.wannier90_bands
+        if 'wannier90_optimal' in bands_outputs:
+            retrieved = bands_outputs.wannier90_optimal.retrieved
+        else:
+            retrieved = bands_outputs.wannier90.retrieved
+        with retrieved.open('aiida.wout') as f:
             lines = f.readlines()
             for line in lines:
                 if '  <-- DIS' in line:
@@ -46,7 +57,11 @@ class Wannier90ResultsModel(ResultsModel):
         return omega_is, omega_tots
 
     def get_wannier_centers_spreads(self, node):
-        outputs = node.outputs.wannier90.wannier90_bands.wannier90_optimal.output_parameters.get_dict()
+        bands_outputs = node.outputs.wannier90.wannier90_bands
+        if 'wannier90_optimal' in bands_outputs:
+            outputs = bands_outputs.wannier90_optimal.output_parameters.get_dict()
+        else:
+            outputs = bands_outputs.wannier90.output_parameters.get_dict()
         columns = [
             {'field': 'id', 'headerName': 'WF', 'editable': False},
             {'field': 'spreads_initial', 'headerName': 'Initial spread (first iteration) (Å2)', 'editable': False, 'width': 130,},
@@ -54,8 +69,8 @@ class Wannier90ResultsModel(ResultsModel):
             {'field': 'centers_final', 'headerName': 'Centers final (Å)', 'editable': False, 'width': 180,},
             {'field': 'centers_initial', 'headerName': 'Centers initial (Å)', 'editable': False, 'width': 180,},
         ]
-        if 'wannier90_plot' in node.outputs.wannier90.wannier90_bands:
-            plot_parameters = node.outputs.wannier90.wannier90_bands.wannier90_plot.output_parameters.get_dict()
+        if 'wannier90_plot' in bands_outputs:
+            plot_parameters = bands_outputs.wannier90_plot.output_parameters.get_dict()
             columns.append({'field': 'im_re_ratio', 'headerName': 'Im_re_ratio', 'editable': False})
         else:
             plot_parameters = None
