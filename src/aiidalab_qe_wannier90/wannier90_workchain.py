@@ -220,14 +220,11 @@ class QeAppWannier90BandsWorkChain(WorkChain):
             overrides = {}
         kwargs = self.inputs.kwargs if 'kwargs' in self.inputs else {}
         wannier_node = self.ctx.wannier90_bands
-        try:
-            wannier_calc = wannier_node.outputs.wannier90_plot.output_parameters.creator
-        except AttributeError:
-            wannier_calc =  wannier_node.outputs.wannier90_optimal.output_parameters.creator
-        parent_folder = wannier_calc.outputs.remote_folder
+        last_wannier_calc = wannier_node.called_descendants[-1]
+        parent_folder = last_wannier_calc.outputs.remote_folder
         pseudos = self.inputs.overrides.pw_bands['scf']['pw']['pseudos']
-        structure = wannier_calc.inputs.structure
-        num_excl_bands = wannier_calc.inputs.parameters.get('exclude_bands', [])
+        structure = last_wannier_calc.inputs.structure
+        num_excl_bands = last_wannier_calc.inputs.parameters.get('exclude_bands', [])
         num_elec_pw = get_number_of_electrons(structure, pseudos)
         num_electrons = num_elec_pw - 2 * len(num_excl_bands)
         if abs(num_electrons - int(num_electrons)) > 1e-5:

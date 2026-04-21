@@ -175,7 +175,10 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
         try:
             self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90_plot.retrieved
         except AttributeError:
-            self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90_optimal.retrieved
+            if 'wannier90_optimal' in self.root_process_node.outputs.wannier90.wannier90_bands:
+                self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90_optimal.retrieved
+            else:
+                self.wannier90_plot_retrieved = self.root_process_node.outputs.wannier90.wannier90_bands.wannier90.retrieved
         filename = f'aiida_{int(1):05d}.xsf'
         self.download_xsf = ipw.HTML('No Wannier function selected for download.')
         # Isosurface
