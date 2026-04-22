@@ -6,75 +6,43 @@
     <div class="alert alert-warning">
     <b>Pre-requisite:</b> This guide assumes that you already followed the <b>Relaxation and electronic
       structure</b> &rarr; <b>Basic tutorial</b> guide, or that you are already familiar with the app.<br>
-      The guide also assumes you followed the <b>Wannier-basic</b> tutorial on Wannier functions,
+      The guide also assumes that you followed the <b>Wannier-basic</b> tutorial on Wannier functions,
       or that you are already familiar with the workflow for Wannier functions calculation in the app.
   </div>
   Click on <b>Step 1: Select structure</b> and follow the instructions to proceed.
 </div>
 
 <div id="structure-step">
-  In the structure selection step, we select the Copper structure from the examples. <br>
   <div class="alert alert-success">
     <h4>Tasks</h4>
-  <ul>
-    <li><b>Click</b> on the "From examples" tab</li>
-    <li>Select <b>"Copper"</b> from the dropdown list</li>
-    <li>Click the <b>Confirm</b> button to proceed</li>
-  </ul>
-    <div class="alert alert-warning">
-      <b>Warning:</b> If the confirmed structure is not yet stored in the AiiDA
-      database, it will be stored automatically when you proceed to the next
-      step.
-    </div>
-    <div class="alert alert-warning">
-      <b>Warning:</b> Changes after confirmation will reset the following steps.
-    </div>
+      <ul>
+          <li>Select the <b>"Copper"</b> example structure</li>
+          <li>Click the <b>Confirm</b> to proceed</li>
+      </ul>
   </div>
 </div>
 
 <div id="configuration-step">
-  In this second step (Configure workflow), we define the parameters needed to
-  perform our Wannier functions calculation.
   <div class="alert alert-success">
     <h4>Tasks</h4>
     <ol>
-      <li>Select <b>Structure as is</b>, i.e. to reduce computational cost for this example calculation,
-        we do not optimize cell parameters or atomic positions.</li>
+      <li>Select <b>Structure as is</b> - we skip optimizing the structure for this example</li>
       <li>Open <b>Step 2.1</b> for further instructions</li>
     </ol>
   </div>
 </div>
 
 <div id="properties-selection">
-  Here we select the properties to calculate. Each property is associated with a
-  workflow that will submit one or more calculations.
   <div class="alert alert-success">
     <h4>Tasks</h4>
     <ol>
-      <li>Select the <b>Wannier functions</b> checkbox</li>
+      <li>Select the <b>Wannier functions</b></li>
       <li>Go to <b>Step 2.2</b> for further instructions</li>
     </ol>
   </div>
 </div>
 
-<div id="calculation-settings">
-  Here we can customize the calculation parameters.
-  The settings are divided into several tabs.
-  Two tabs are always present:
-  <ul>
-    <li><b>Basic settings</b>: top-level calculation settings</li>
-    <li><b>Advanced settings</b>: fine-tune the calculations</li>
-  </ul>
-  Additionally, each plugin activated in the previous step 2.1 can add additional tabs.
-
-  Note that the app pre-configures defaults for most parameters.
-  <div class="alert alert-success">
-    See further instructions in the <b>Basic settings</b> panel below.
-  </div>
-</div>
-
 <div id="basic-settings">
-  Here we define the basic settings of the simulations.
   <div class="alert alert-success">
     <h4>Tasks</h4>
       <ol>
@@ -89,7 +57,6 @@
 </div>
 
 <div id="wannier90-settings">
-  In the Wannier functions settings panel, we can customize the parameters for the calculations that are using Wannier function basis.
   <div class="alert alert-success">
     <h4>Tasks</h4>
       <ul>
@@ -100,96 +67,37 @@
         <li>Setup magnetic field rotation by specifying the azimuthal (φ) and polar (θ) angles
             for the start and the end of the rotation as well as the number of steps.
             for the tutorial, we will use the default values for the angles and reduce the number of steps to 45.</li>
-        <li>Click on the <b>Confirm</b> button to proceed</li>
+        <li>Click <b>Confirm</b> to proceed</li>
       </ul>
-
-    <div class="alert alert-warning">
-      <b>Warning:</b> Changes after confirmation will reset the following steps.
-    </div>
   </div>
 </div>
 
 <div id="submission-step">
-  <p>
-    In the submission step, we define the computational resources to be used in
-    the calculations. The global resources are used to define resources across
-    all workflow calculations. Optionally, you can override the resource
-    settings for specific calculations.
-  </p>
-  <div class="alert alert-warning">
-    <b>Warning:</b> If running locally (for example, on the AiiDAlab demo
-    server), we recommend keeping nodes and CPUs at the default minimum of 1
-    each.
-  </div>
-  <p>
-    Once the resources are defined, we can optionally customize the workflow
-    label (pre-filled according to the settings of steps 1 & 2), as well as
-    provide a detailed description of the workflow. Once we are ready, we can
-    submit the workflow.
-
-    You first need to select which code (code executable + computer where this
-    will run) to use for each step of the workflow. The Quantum ESPRESSO app
-    should always install a local Quantum ESPRESSO executable.
-    To setup additional codes, e.g. Wannier90 if not already provided by app or codes installed on remote
-    supercomputers, please refer to the corresponding
-    <a
-      href="https://aiidalab-qe.readthedocs.io/howto/setup_computer_code.html#"
-      target="_blank"
-    >
-      documentation</a
-    >.
-  </p>
   <div class="alert alert-success">
     <h4>Tasks</h4>
     <ol>
-      <li>Select 1 node and 1 CPU for each of the codes below</li>
-      <li><b>(Optional)</b> customize the workflow label</li>
-      <li><b>(Optional)</b> add a workflow description</li>
-      <li>Click the <b>Submit</b> button to proceed</li>
+      <li>Keep the default resources (1 node/1 CPU per code)</li>
+      <li><b>(Optional)</b> customize the workflow label and description</li>
+      <li>Click the <b>Submit</b> to submit the workflow to the AiiDA engine</li>
     </ol>
-    <div class="alert alert-warning">
-      <b>Warning:</b> The workflow may take a moment to submit.
-    </div>
   </div>
 </div>
 
 <div id="results-step">
-  Below you can monitor the status of the calculation, that might take
-  several minutes to conclude even if we are using the fast protocol.
-
-  Click on the <b>Results</b> panel.
-  In the results panel, each tab will open results pertaining to a specific
-  calculation submitted by the workflow.
+  Switch to the <b>Results</b> panel for further instructions.
   <div class="alert alert-success">
-    See further instructions below in the <b>Wannier functions</b> results tab.
+    Check the <b>Wannier functions</b> results tab.
   </div>
 </div>
 
 <div id="wannier90-results">
-  When Wannier functions results are available, the <b>Load results</b> button will become active, allowing us to
+  Once the calculation is complete, the <b>Load results</b> button will become active, allowing us to
   load the results from AiiDA.
 </div>
 
 <div id="wannier90-band-results">
-  Here we can compare the electronic band structures computed from DFT and Wannier interpolation.
-  DFT band structure is shown in solid black lines, while Wannier-interpolated band structure is
-  shown in dashed red lines.
-  <div class="alert alert-warning">
-    For "Fast" protocol, the Wannier-interpolated band structure is not expected
-    to perfectly match the DFT one, but it should still capture the main features of the band structure.
-    In order to improve the agreement, you can select the "Balanced" protocol and re-run the workflow.
-  </div>
-</div>
-
-<div id="wannierization-details">
-  The table below summarizes the details of the Wannierization procedure, including the number of Wannier functions,
-  the spread values and the average distance between Wannier and DFT bands as defined in
-  J. Qiao et al. </i>npj. Comput. Mater.</i> <b>9</b>, 208 (2023).
-</div>
-
-<div id="wannier90-centers-spreads">
-    The list of Wannier functions with their center positions and spreads is shown in the table below.
-
+  WWe can see that the Wannier-interpolated band structure (dashed red) reproduces well the DFT band structure (solid black)
+  up to the Fermi level.
 </div>
 
 <div id="dHvA-results">
@@ -202,7 +110,3 @@
     the tight-binding Hamiltonian file
     or real-space Wannier function data.
 </div>
-
-<!-- <div id="post-guide">
-  <h4>Post-guide exercises</h4>
-</div> -->

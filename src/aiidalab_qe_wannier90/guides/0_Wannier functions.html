@@ -20,8 +20,6 @@
 </div>
 
 <div id="configuration-step">
-  In this second step (Configure workflow), we define the parameters needed to
-  perform our Wannier functions calculation.
   <div class="alert alert-success">
     <h4>Tasks</h4>
     <ol>
@@ -57,23 +55,18 @@
 </div>
 
 <div id="wannier90-settings">
+  This section customizes the Wannier function calculation.<br>
+  "Retrieve Hamiltonian '_tb.dat' file" checkbox allows to save the tight-binding Hamiltonian file produced by Wannier90.<br>
+  Other input/output files ('amn', 'mmn', 'eig', 'chk', 'spn') can also be saved for reuse by ticking the corresponding checkbox.<br>
+  You can learn more about the "Compute Fermi surface" option in the corresponding in-app guide.<br>
+  "Automated Wannierization algorithm" and "Frozen states" dropdowns describe the algorithm
+  and parameters for the automated Wannierization process.
   <div class="alert alert-success">
     <h4>Tasks</h4>
       <ul>
         <li>Tick the <b>Compute real-space Wannier functions</b> checkbox</li>
         <li>Click <b>Confirm</b> to proceed</li>
       </ul>
-    <div class="alert alert-warning">
-      <b>Note:</b> "Retrieve Hamiltonian '_tb.dat' file" checkbox allows to save the tight-binding Hamiltonian
-       file produced by Wannier90.<br>
-       Other input/output files ('amn', 'mmn', 'eig', 'chk', 'spn') can also be saved
-       for reuse by ticking the corresponding checkbox.<br>
-       You can learn more about the "Compute Fermi surface" option
-       in the corresponding in-app guide.<br>
-       "Automated Wannierization algorithm" and "Frozen states" dropdowns describe the algorithm
-        and parameters for the automated Wannierization process.
-    </div>
-
   </div>
 </div>
 
@@ -89,7 +82,10 @@
 </div>
 
 <div id="results-step">
-  Switch to the <b>Results</b> panel for further instructions.
+    Switch to the <b>Results</b> panel for further instructions.
+  <div class="alert alert-success">
+    Check the <b>Wannier functions</b> results tab.
+  </div>
 </div>
 
 <div id="wannier90-results">
@@ -122,7 +118,3 @@
     In the following section you can download desired files, such as the tight-binding Hamiltonian file
     or real-space Wannier function data.
 </div>
-
-<!-- <div id="post-guide">
-  <h4>Post-guide exercises</h4>
-</div> -->
