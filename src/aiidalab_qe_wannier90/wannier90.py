@@ -6,6 +6,8 @@ from .setting import ConfigurationSettingPanel
 from .workchain import workchain_and_builder
 from .result import Wannier90ResultsPanel, Wannier90ResultsModel
 
+from pathlib import Path
+
 
 class PluginOutline(PluginOutline):
     title = 'Wannier functions'
@@ -25,5 +27,9 @@ wannier90 = {
     'result': {
         'panel': Wannier90ResultsPanel,
         'model': Wannier90ResultsModel,
+    },
+    'guides': {
+        'title': 'Wannier functions',
+        'path': Path(__file__).resolve().parent / 'guides',
     },
 }
