@@ -78,74 +78,31 @@
 </div>
 
 <div id="submission-step">
-  <p>
-    In the submission step, we define the computational resources to be used in
-    the calculations. The global resources are used to define resources across
-    all workflow calculations. Optionally, you can override the resource
-    settings for specific calculations.
-  </p>
-  <div class="alert alert-warning">
-    <b>Warning:</b> If running locally (for example, on the AiiDAlab demo
-    server), we recommend keeping nodes and CPUs at the default minimum of 1
-    each.
-  </div>
-  <p>
-    Once the resources are defined, we can optionally customize the workflow
-    label (pre-filled according to the settings of steps 1 & 2), as well as
-    provide a detailed description of the workflow. Once we are ready, we can
-    submit the workflow.
-
-    You first need to select which code (code executable + computer where this
-    will run) to use for each step of the workflow. The Quantum ESPRESSO app
-    should always install a local Quantum ESPRESSO executable.
-    To setup additional codes, e.g. Wannier90 if not already provided by app or codes installed on remote
-    supercomputers, please refer to the corresponding
-    <a
-      href="https://aiidalab-qe.readthedocs.io/howto/setup_computer_code.html#"
-      target="_blank"
-    >
-      documentation</a
-    >.
-  </p>
   <div class="alert alert-success">
     <h4>Tasks</h4>
     <ol>
-      <li>Select 1 node and 1 CPU for each of the codes below</li>
-      <li><b>(Optional)</b> customize the workflow label</li>
-      <li><b>(Optional)</b> add a workflow description</li>
-      <li>Click the <b>Submit</b> button to proceed</li>
+      <li>Keep the default resources (1 node/1 CPU per code)</li>
+      <li><b>(Optional)</b> customize the workflow label and description</li>
+      <li>Click<b>Submit</b> to submit the workflow to the AiiDA engine</li>
     </ol>
-    <div class="alert alert-warning">
-      <b>Warning:</b> The workflow may take a moment to submit.
-    </div>
   </div>
 </div>
 
 <div id="results-step">
-  Below you can monitor the status of the calculation, that might take
-  several minutes to conclude even if we are using the fast protocol.
-
-  Click on the <b>Results</b> panel.
-  In the results panel, each tab will open results pertaining to a specific
-  calculation submitted by the workflow.
-  <div class="alert alert-success">
-    See further instructions below in the <b>Wannier functions</b> results tab.
-  </div>
+  Switch to the <b>Results</b> panel for further instructions.
 </div>
 
 <div id="wannier90-results">
-  When Wannier functions results are available, the <b>Load results</b> button will become active, allowing us to
-  load the results from AiiDA.
+  Once the Wannier functions calculation is complete, the <b>Load results</b> button will become active, allowing us to load the results from AiiDA.
 </div>
 
 <div id="wannier90-band-results">
   Here we can compare the electronic band structures computed from DFT and Wannier interpolation.
-  DFT band structure is shown in solid black lines, while Wannier-interpolated band structure is
+  DFT bands are shown in solid black lines, while Wannier-interpolated bands are
   shown in dashed red lines.
   <div class="alert alert-warning">
     For "Fast" protocol, the Wannier-interpolated band structure is not expected
     to perfectly match the DFT one, but it should still capture the main features of the band structure.
-    In order to improve the agreement, you can select the "Balanced" protocol and re-run the workflow.
   </div>
 </div>
 
@@ -157,7 +114,9 @@
 
 <div id="wannier90-centers-spreads">
     The list of Wannier functions with their center positions and spreads is shown in the table below.
-    Click on a table row to visualize the corresponding Wannier function in real space (shown below).
+    <div class="alert alert-success">
+      Click on a table row to visualize the corresponding Wannier function in real space (shown below).
+    </div>
 </div>
 <div id="wannier90-download">
     In the following section you can download desired files, such as the tight-binding Hamiltonian file
