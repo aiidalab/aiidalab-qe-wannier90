@@ -289,7 +289,6 @@ class Wannier90ResultsPanel(ResultsPanel[Wannier90ResultsModel]):
 
         # Arrange components in the panel
         self.children = [
-            InAppGuide(identifier='wannier90-results'),
             ipw.VBox([
                 ipw.HTML('<h2>DFT and Wannier-interpolated electronic band structure</h2>'),
                 InAppGuide(identifier='wannier90-band-results'),

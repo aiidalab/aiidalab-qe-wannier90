@@ -12,10 +12,10 @@
 <div id="structure-step">
   <div class="alert alert-success">
     <h4>Tasks</h4>
-      <ul>
+      <ol>
         <li>Select the <b>"Gallium arsenide"</b> example structure</li>
         <li>Click <b>Confirm</b> to proceed</li>
-      </ul>
+      </ol>
   </div>
 </div>
 
@@ -48,10 +48,6 @@
         <li>See further instructions in the <b>Wannier functions</b> panel</li>
       </ol>
   </div>
-  <div class="alert alert-warning">
-    <b>Note:</b> For the purpose of completing this guide in short time, we will use the <b>Fast</b> protocol for default parameters.
-    However, you if dispose of enough computational resources, you can also select Balanced or Stringent.
-  </div>
 </div>
 
 <div id="wannier90-settings">
@@ -63,10 +59,10 @@
   and parameters for the automated Wannierization process.
   <div class="alert alert-success">
     <h4>Tasks</h4>
-      <ul>
+      <ol>
         <li>Tick the <b>Compute real-space Wannier functions</b> checkbox</li>
         <li>Click <b>Confirm</b> to proceed</li>
-      </ul>
+      </ol>
   </div>
 </div>
 
@@ -76,20 +72,18 @@
     <ol>
       <li>Keep the default resources (1 node/1 CPU per code)</li>
       <li><b>(Optional)</b> customize the workflow label and description</li>
-      <li>Click<b>Submit</b> to submit the workflow to the AiiDA engine</li>
+      <li>Click <b>Submit</b> to submit the workflow to the AiiDA engine</li>
     </ol>
   </div>
 </div>
 
 <div id="results-step">
-    Switch to the <b>Results</b> panel for further instructions.
-  <div class="alert alert-success">
-    Check the <b>Wannier functions</b> results tab.
-  </div>
-</div>
-
-<div id="wannier90-results">
-  Once the Wannier functions calculation is complete, the <b>Load results</b> button will become active, allowing us to load the results from AiiDA.
+  <h4>Tasks</h4>
+    <ol>
+      <li>Switch to the <b>Results</b> panel for further instructions</li>
+      <li>Click on the <b>Wannier functions</b> tab</li>
+      <li>Click the <b>Load results</b> button once it becomes available</li>
+    </ol>
 </div>
 
 <div id="wannier90-band-results">
@@ -97,7 +91,7 @@
   DFT bands are shown in solid black lines, while Wannier-interpolated bands are
   shown in dashed red lines.
   <div class="alert alert-warning">
-    For "Fast" protocol, the Wannier-interpolated band structure is not expected
+    For <b>Fast</b> protocol, the Wannier-interpolated band structure is not expected
     to perfectly match the DFT one, but it should still capture the main features of the band structure.
   </div>
 </div>
