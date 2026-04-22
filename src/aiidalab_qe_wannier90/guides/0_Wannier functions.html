@@ -14,7 +14,7 @@
     <h4>Tasks</h4>
       <ul>
         <li>Select the <b>"Gallium arsenide"</b> example structure</li>
-        <li>Click the <b>Confirm</b> button to proceed</li>
+        <li>Click <b>Confirm</b> to proceed</li>
       </ul>
   </div>
 </div>
@@ -25,43 +25,24 @@
   <div class="alert alert-success">
     <h4>Tasks</h4>
     <ol>
-      <li>Select <b>Structure as is</b>, i.e. to reduce computational cost for this example calculation,
-        we do not optimize cell parameters or atomic positions.</li>
+      <li>Select <b>Structure as is</b> - we skip optimizing the structure for this example</li>
       <li>Open <b>Step 2.1</b> for further instructions</li>
     </ol>
   </div>
 </div>
 
 <div id="properties-selection">
-  Here we select the properties to calculate. Each property is associated with a
-  workflow that will submit one or more calculations.
   <div class="alert alert-success">
     <h4>Tasks</h4>
     <ol>
-      <li>Select the <b>Wannier functions</b> checkbox</li>
+      <li>Select <b>Wannier functions</b></li>
       <li>Go to <b>Step 2.2</b> for further instructions</li>
     </ol>
   </div>
 </div>
 
-<div id="calculation-settings">
-  Here we can customize the calculation parameters.
-  The settings are divided into several tabs.
-  Two tabs are always present:
-  <ul>
-    <li><b>Basic settings</b>: top-level calculation settings</li>
-    <li><b>Advanced settings</b>: fine-tune the calculations</li>
-  </ul>
-  Additionally, each plugin activated in the previous step 2.1 can add additional tabs.
-
-  Note that the app pre-configures defaults for most parameters.
-  <div class="alert alert-success">
-    See further instructions in the <b>Basic settings</b> panel below.
-  </div>
-</div>
 
 <div id="basic-settings">
-  Here we define the basic settings of the simulations.
   <div class="alert alert-success">
     <h4>Tasks</h4>
       <ol>
@@ -76,12 +57,11 @@
 </div>
 
 <div id="wannier90-settings">
-  In the Wannier functions settings panel, we can customize the parameters for the Wannier functions calculation.
   <div class="alert alert-success">
     <h4>Tasks</h4>
       <ul>
-        <li>Tick <b>Compute real-space Wannier functions</b> checkbox to be able to visualize them.</li>
-        <li>Click on the <b>Confirm</b> button to proceed</li>
+        <li>Tick the <b>Compute real-space Wannier functions</b> checkbox</li>
+        <li>Click <b>Confirm</b> to proceed</li>
       </ul>
     <div class="alert alert-warning">
       <b>Note:</b> "Retrieve Hamiltonian '_tb.dat' file" checkbox allows to save the tight-binding Hamiltonian
@@ -94,9 +74,6 @@
         and parameters for the automated Wannierization process.
     </div>
 
-    <div class="alert alert-warning">
-      <b>Warning:</b> Changes after confirmation will reset the following steps.
-    </div>
   </div>
 </div>
 
