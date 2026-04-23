@@ -64,9 +64,9 @@ docs = [
 
 [project.urls]
 documentation = 'https://aiidalab-qe-wannier90.readthedocs.io/'
-homepage = 'https://github.com/superstar54/aiidalab-qe-wannier90'
-source = 'https://github.com/superstar54/aiidalab-qe-wannier90'
-tracker = 'https://github.com/superstar54/aiidalab-qe-wannier90/issues'
+homepage = 'https://github.com/aiidalab/aiidalab-qe-wannier90'
+source = 'https://github.com/aiidalab/aiidalab-qe-wannier90'
+tracker = 'https://github.com/aiidalab/aiidalab-qe-wannier90/issues'
 
 [tool.flit.module]
 name = 'aiidalab_qe_wannier90'
