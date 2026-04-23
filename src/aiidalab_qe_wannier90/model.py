@@ -1,4 +1,11 @@
 import traitlets as tl
+from aiida import orm
+from aiida_quantumespresso.calculations.functions.create_kpoints_from_distance import (
+    create_kpoints_from_distance,
+)
+from aiida_wannier90_workflows.workflows.base.wannier90 import (
+    Wannier90BaseWorkChain,
+)
 from aiidalab_qe.common.mixins import HasInputStructure
 from aiidalab_qe.common.panel import ConfigurationSettingsModel
 
@@ -21,6 +28,8 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
     number_of_disproj_min = tl.Int(allow_none=True, default_value=2)
     retrieve_hamiltonian = tl.Bool(allow_none=True, default_value=True)
     retrieve_matrices = tl.Bool(allow_none=True, default_value=False)
+    nscf_kpoints_distance = tl.Float(0.1)
+    mesh_grid = tl.Unicode('')
     projection_type = tl.Unicode(allow_none=True, default_value='atomic_projectors_qe')
     frozen_type = tl.Unicode(allow_none=True, default_value='fixed_plus_projectability')
     energy_window_input = tl.Float(allow_none=True, default_value=2.0)
@@ -36,6 +45,12 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
 
     protocol = tl.Unicode(allow_none=True)
     electronic_type = tl.Unicode(allow_none=True)
+
+    def update(self, specific=''):
+        with self.hold_trait_notifications():
+            if not specific or specific != 'mesh':
+                self._update_nscf_kpoints_distance()
+            self._update_kpoints_mesh()
 
     def _check_blockers(self):
         if self.electronic_type == 'insulator':
@@ -61,6 +76,7 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
             'energy_window_input': self.energy_window_input,
             'compute_fermi_surface': self.compute_fermi_surface,
             'scan_pdwf_parameter': self.scan_pdwf_parameter,
+            'nscf_kpoints_distance': self.nscf_kpoints_distance,
         }
         if self.compute_fermi_surface:
             state |= {
@@ -91,3 +107,62 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
         self.dhva_starting_theta = parameters.get('dHvA_frequencies_parameters', {}).get('starting_theta', 90.0)
         self.dhva_num_rotation = parameters.get('dHvA_frequencies_parameters', {}).get('num_rotation', 90)
         self.scan_pdwf_parameter = parameters.get('scan_pdwf_parameter', False)
+        self.nscf_kpoints_distance = parameters.get(
+            'nscf_kpoints_distance',
+            self._get_default('nscf_kpoints_distance'),
+        )
+
+    def reset(self):
+        with self.hold_trait_notifications():
+            self.exclude_semicore = self._get_default('exclude_semicore')
+            self.plot_wannier_functions = self._get_default('plot_wannier_functions')
+            self.retrieve_hamiltonian = self._get_default('retrieve_hamiltonian')
+            self.retrieve_matrices = self._get_default('retrieve_matrices')
+            self.number_of_disproj_max = self._get_default('number_of_disproj_max')
+            self.number_of_disproj_min = self._get_default('number_of_disproj_min')
+            self.projection_type = self._get_default('projection_type')
+            self.frozen_type = self._get_default('frozen_type')
+            self.energy_window_input = self._get_default('energy_window_input')
+            self.compute_fermi_surface = self._get_default('compute_fermi_surface')
+            self.scan_pdwf_parameter = self._get_default('scan_pdwf_parameter')
+            self.nscf_kpoints_distance = self._get_default('nscf_kpoints_distance')
+            self.fermi_surface_kpoint_distance = self._get_default(
+                'fermi_surface_kpoint_distance'
+            )
+            self.compute_dhva_frequencies = self._get_default(
+                'compute_dhva_frequencies'
+            )
+            self.dhva_starting_phi = self._get_default('dhva_starting_phi')
+            self.dhva_starting_theta = self._get_default('dhva_starting_theta')
+            self.dhva_ending_phi = self._get_default('dhva_ending_phi')
+            self.dhva_ending_theta = self._get_default('dhva_ending_theta')
+            self.dhva_num_rotation = self._get_default('dhva_num_rotation')
+
+    def _update_kpoints_mesh(self, _=None):
+        if not self.has_structure:
+            mesh_grid = ''
+        elif self.nscf_kpoints_distance > 0:
+            mesh = create_kpoints_from_distance.process_class._func(
+                self.input_structure,
+                orm.Float(self.nscf_kpoints_distance),
+                orm.Bool(False),
+            )
+            mesh_grid = f'Mesh {mesh.get_kpoints_mesh()[0]!s}'
+        else:
+            mesh_grid = 'Please select a number higher than 0.0'
+        self._defaults['mesh_grid'] = mesh_grid
+        self.mesh_grid = mesh_grid
+
+    def _update_nscf_kpoints_distance(self):
+        if self.has_pbc:
+            protocol_map = {
+                'balanced': 'moderate',
+                'stringent': 'precise',
+            }
+            protocol = protocol_map.get(self.protocol, self.protocol)
+            parameters = Wannier90BaseWorkChain.get_protocol_inputs(protocol=protocol)
+            nscf_kpoints_distance = parameters['meta_parameters']['kpoints_distance']
+        else:
+            nscf_kpoints_distance = 100.0
+        self._defaults['nscf_kpoints_distance'] = nscf_kpoints_distance
+        self.nscf_kpoints_distance = self._defaults['nscf_kpoints_distance']
