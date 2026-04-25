@@ -27,21 +27,23 @@ def get_builder(codes, structure, parameters, **kwargs):
     dHvA_frequencies_parameters = wannier90_parameters.pop('dHvA_frequencies_parameters', None)
 
     all_codes = {
-                'pw': codes.get('pw')['code'],
-                'pw2wannier90': codes.get('pw2wannier90')['code'],
-                'projwfc': codes.get('projwfc')['code'],
-                'wannier90': codes.get('wannier90')['code']
-            }
+        'pw': codes['pw'].pop('code'),
+        'pw2wannier90': codes['pw2wannier90'].pop('code'),
+        'projwfc': codes['projwfc'].pop('code'),
+        'wannier90': codes['wannier90'].pop('code')
+    }
     if compute_dhva_frequencies:
-        all_codes['skeaf'] = codes.get('skeaf')['code']
-        all_codes['wan2skeaf'] = codes.get('wan2skeaf')['code']
+        all_codes['skeaf'] = codes['skeaf'].pop('code')
+        all_codes['wan2skeaf'] = codes['wan2skeaf'].pop('code')
     check_codes(all_codes)
+
     protocol = parameters['workchain']['protocol']
     protocol_map = {
         'balanced': 'moderate',
         'stringent': 'precise'
     }
     protocol = protocol_map.get(protocol, protocol)
+
     overrides = {
         'pw_bands': {
             'scf': deepcopy(parameters['advanced']),
@@ -52,22 +54,13 @@ def get_builder(codes, structure, parameters, **kwargs):
             'wannier90_parameters': wannier90_parameters,
         },
     }
-    parallelization = {
-        'num_machines': codes['pw']['nodes'],
-        'num_mpiprocs_per_machine': codes['pw']['ntasks_per_node'],
-        'max_wallclock_seconds': codes['pw']['max_wallclock_seconds'],
-    }
-    if 'npool' in codes['pw']['parallelization']:
-        parallelization.update({
-            'npool': codes['pw']['parallelization']['npool'],
-        })
 
     builder = QeAppWannier90BandsWorkChain.get_builder_from_protocol(
-        codes=all_codes,
         structure=structure,
         protocol=protocol,
+        codes=all_codes,
+        resources=codes,
         overrides=overrides,
-        parallelization=parallelization,
         exclude_semicore=exclude_semicore,
         plot_wannier_functions=plot_wannier_functions,
         electronic_type=ElectronicType(parameters['workchain']['electronic_type']),
@@ -83,6 +76,7 @@ def get_builder(codes, structure, parameters, **kwargs):
         dHvA_frequencies_parameters=dHvA_frequencies_parameters,
         **kwargs,
     )
+
     return builder
 
 

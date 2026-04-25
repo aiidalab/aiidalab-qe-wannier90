@@ -5,8 +5,9 @@ from aiida_wannier90_workflows.workflows.bands import Wannier90BandsWorkChain
 from aiida_wannier90_workflows.workflows.optimize import Wannier90OptimizeWorkChain
 from aiida_quantumespresso.workflows.pw.bands import PwBandsWorkChain
 from aiida_skeaf.workflows import SkeafWorkChain
-from aiida_wannier90_workflows.utils.workflows.builder.setter import set_parallelization
-from aiidalab_qe.utils import enable_pencil_decomposition
+from aiidalab_qe.utils import enable_pencil_decomposition, set_component_resources
+
+
 class QeAppWannier90BandsWorkChain(WorkChain):
     """Workchain to run a bands calculation with Quantum ESPRESSO and Wannier90."""
 
@@ -16,10 +17,12 @@ class QeAppWannier90BandsWorkChain(WorkChain):
 
         spec.input('structure', valid_type=orm.StructureData)
         spec.input('protocol', valid_type=orm.Str)
+
         spec.input_namespace('codes', valid_type=orm.Code, dynamic=True)
+        spec.input_namespace('resources', dynamic=True, required=True)
         spec.input_namespace('overrides', dynamic=True, required=False)
         spec.input_namespace('kwargs', dynamic=True, required=False)
-        spec.input('parallelization', valid_type=orm.Dict, required=False)
+
         spec.expose_outputs(
             PwBandsWorkChain,
             namespace='pw_bands',
@@ -58,25 +61,28 @@ class QeAppWannier90BandsWorkChain(WorkChain):
                      )
 
         spec.exit_code(
-            400, 'ERROR_PW_BANDS_WORKCHAIN_FAILED', message='The pw bands workchain failed.'
+            400, 'ERROR_PW_BANDS_WORKCHAIN_FAILED',
+            message='The pw bands workchain failed.',
         )
         spec.exit_code(
-            401, 'ERROR_WANNIER90_BANDS_WORKCHAIN_FAILED', message='The wannier90 bands workchain failed.'
+            401, 'ERROR_WANNIER90_BANDS_WORKCHAIN_FAILED',
+            message='The wannier90 bands workchain failed.',
         )
 
     @classmethod
     def get_builder_from_protocol(
         cls,
         codes,
+        resources,
         structure,
         protocol=None,
-        parallelization=None,
         overrides=None,
         **kwargs,
     ):
         """Return a BandsWorkChain builder prepopulated with inputs following the specified protocol
 
         :param codes: the codes required by the workchain.
+        :param resources: the computational resources to use.
         :param structure: the ``StructureData`` instance to use.
         :param protocol: protocol to use, if not specified, the default will be used.
 
@@ -84,14 +90,13 @@ class QeAppWannier90BandsWorkChain(WorkChain):
 
         builder = cls.get_builder()
         builder.codes = codes
+        builder.resources = resources
         builder.structure = structure
         builder.protocol = protocol
         if overrides:
             builder.overrides = overrides
         if kwargs:
             builder.kwargs = kwargs
-        if parallelization:
-            builder.parallelization = parallelization
         return builder
 
     def setup(self):
@@ -104,7 +109,9 @@ class QeAppWannier90BandsWorkChain(WorkChain):
             overrides = self.inputs.overrides.get('pw_bands', {})
         else:
             overrides = {}
+
         kwargs = self.inputs.kwargs if 'kwargs' in self.inputs else {}
+
         builder = PwBandsWorkChain.get_builder_from_protocol(
             code = self.inputs.codes['pw'],
             structure = self.inputs.structure,
@@ -114,12 +121,18 @@ class QeAppWannier90BandsWorkChain(WorkChain):
         )
         builder.pop('relax')
         builder.metadata.call_link_label = 'pw_bands'
-        if 'parallelization' in self.inputs:
-            set_parallelization(
-                builder, self.inputs.parallelization.get_dict(), process_class=PwBandsWorkChain
-            )
+
+        pw_code_info = {
+            'code': self.inputs.codes['pw'],
+            **self.inputs.resources['pw'],
+        }
+
+        set_component_resources(builder.scf.pw, pw_code_info)
         enable_pencil_decomposition(builder.scf.pw)
+
+        set_component_resources(builder.bands.pw, pw_code_info)
         enable_pencil_decomposition(builder.bands.pw)
+
         node = self.submit(builder)
         self.report(f'submitting `WorkChain` <PK={node.pk}>')
         self.to_context(**{'pw_bands': node})
@@ -145,25 +158,32 @@ class QeAppWannier90BandsWorkChain(WorkChain):
         if not pw_bands_node.is_finished_ok:
             self.report('Bands workchain failed')
             return self.exit_codes.ERROR_WORKCHAIN_FAILED
+
         scf_calc = pw_bands_node.outputs.scf_parameters.creator
         parent_folder = scf_calc.outputs.remote_folder
         structure = scf_calc.inputs.structure
         reference_bands = pw_bands_node.outputs.band_structure
         bands_kpoints = reference_bands.creator.inputs.kpoints
+
         if 'overrides' in self.inputs:
             overrides = self.inputs.overrides.get('wannier90_bands', {})
         else:
             overrides = {}
+
         wannier90_parameters = overrides.pop('wannier90_parameters', {})
         scan_pdwf_parameter = wannier90_parameters.pop('scan_pdwf_parameter', False)
+
         if scan_pdwf_parameter:
             number_of_disproj_max = 15
             number_of_disproj_min = 2
         else:
             number_of_disproj_max = 1
             number_of_disproj_min = 1
+
         kwargs_filtered = {k: v for k, v in self.inputs.kwargs.items() if k not in ['compute_dhva_frequencies','dHvA_frequencies_parameters']}
+
         codes = {key: value for key, value in self.inputs.codes.items()}
+
         builder = Wannier90OptimizeWorkChain.get_builder_from_protocol(
             codes = codes,
             structure = structure,
@@ -175,19 +195,50 @@ class QeAppWannier90BandsWorkChain(WorkChain):
         )
         builder.optimize_disprojmax_range = orm.List(list=list(np.linspace(0.99, 0.85, number_of_disproj_max)))
         builder.optimize_disprojmin_range = orm.List(list=list(np.linspace(0.01, 0.15, number_of_disproj_min)))
-        builder.pop('scf')
-        builder.nscf.pw.parent_folder = parent_folder
-        if 'parallelization' in self.inputs:
-            set_parallelization(
-                builder, self.inputs.parallelization.get_dict(), process_class=Wannier90BandsWorkChain
-            )
+
         kwargs = self.inputs.kwargs if 'kwargs' in self.inputs else {}
         if kwargs.get('plot_wannier_functions', False):
             builder.wannier90.wannier90.metadata.options.additional_retrieve_list = [
                 '*.xsf',
             ]
+
+        builder.pop('scf')
+        builder.nscf.pw.parent_folder = parent_folder
+
+        set_component_resources(
+            builder.nscf.pw,
+            {
+                'code': self.inputs.codes['pw'],
+                **self.inputs.resources['pw']
+            }
+        )
         enable_pencil_decomposition(builder.nscf.pw)
+
+        # set_component_resources(
+        #     builder.projwfc.projwfc,
+        #     {
+        #         'code': self.inputs.codes['projwfc'],
+        #         **self.inputs.resources['projwfc']
+        #     }
+        # )
         # enable_pencil_decomposition(builder.projwfc)
+
+        set_component_resources(
+            builder.wannier90.wannier90,
+            {
+                'code': self.inputs.codes['wannier90'],
+                **self.inputs.resources['wannier90']
+            }
+        )
+
+        set_component_resources(
+            builder.pw2wannier90.pw2wannier90,
+            {
+                'code': self.inputs.codes['pw2wannier90'],
+                **self.inputs.resources['pw2wannier90']
+            }
+        )
+
         node = self.submit(builder)
         self.report(f'submitting `WorkChain` <PK={node.pk}>')
         self.to_context(**{'wannier90_bands': node})
@@ -214,10 +265,12 @@ class QeAppWannier90BandsWorkChain(WorkChain):
     def run_skeaf(self):
         """Run the `SkeafWorkChain` to compute the dHvA frequencies"""
         from aiida_wannier90_workflows.utils.pseudo import get_number_of_electrons
+
         if 'overrides' in self.inputs:
             overrides = self.inputs.overrides.get('skeaf', {})
         else:
             overrides = {}
+
         kwargs = self.inputs.kwargs if 'kwargs' in self.inputs else {}
         wannier_node = self.ctx.wannier90_bands
         last_wannier_calc = wannier_node.called_descendants[-1]
@@ -227,8 +280,10 @@ class QeAppWannier90BandsWorkChain(WorkChain):
         num_excl_bands = last_wannier_calc.inputs.parameters.get('exclude_bands', [])
         num_elec_pw = get_number_of_electrons(structure, pseudos)
         num_electrons = num_elec_pw - 2 * len(num_excl_bands)
+
         if abs(num_electrons - int(num_electrons)) > 1e-5:
             raise ValueError('Non-integer number of electrons?')
+
         num_electrons = int(num_electrons)
 
         code_labels = ['wan2skeaf', 'skeaf']
@@ -236,10 +291,10 @@ class QeAppWannier90BandsWorkChain(WorkChain):
         codes = {label: self.inputs.codes[label] for label in code_labels}
 
         builder = SkeafWorkChain.get_builder_from_protocol(
-        codes=codes,
-        bxsf=parent_folder,
-        num_electrons=num_electrons,
-        protocol=self.inputs.protocol.value,
+            codes=codes,
+            bxsf=parent_folder,
+            num_electrons=num_electrons,
+            protocol=self.inputs.protocol.value,
         )
 
         skeaf_params = builder.skeaf.parameters.get_dict()
@@ -247,6 +302,22 @@ class QeAppWannier90BandsWorkChain(WorkChain):
             kwargs.get('dHvA_frequencies_parameters', {}),
         )
         builder.skeaf.parameters = orm.Dict(skeaf_params)
+
+        set_component_resources(
+            builder.skeaf,
+            {
+                'code': self.inputs.codes['skeaf'],
+                **self.inputs.resources.get('skeaf', {})
+            }
+        )
+
+        set_component_resources(
+            builder.wan2skeaf,
+            {
+                'code': self.inputs.codes['wan2skeaf'],
+                **self.inputs.resources.get('wan2skeaf', {})
+            }
+        )
 
         node = self.submit(builder)
         self.report(f'submitting `WorkChain` <PK={node.pk}>')
