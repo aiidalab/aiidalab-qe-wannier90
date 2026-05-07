@@ -8,7 +8,7 @@ class ConfigurationSettingsModel(ConfigurationSettingsModel, HasInputStructure):
     identifier = 'wannier90'
 
     dependencies = [
-        'input_structure',
+        'structure_uuid',
         'workchain.protocol',
         'workchain.electronic_type',
     ]
