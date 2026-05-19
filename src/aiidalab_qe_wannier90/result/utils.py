@@ -77,7 +77,7 @@ def plot_skeaf(skeaf_data):
             # If neither phi nor theta has unique values, skip this band
             continue
 
-        labels.extend([band] * len(x))  # repeat band name for each point
+        labels.extend([band] * len(freq))
 
     # Create scatter plot
     fig = px.scatter(x=x, y=y, color=labels,
