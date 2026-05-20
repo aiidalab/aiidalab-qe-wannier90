@@ -77,6 +77,7 @@ def plot_skeaf(skeaf_data):
             # If neither phi nor theta has unique values, skip this band
             continue
 
+        # This is to ensure that frequencies from the same Wannier band have the same color in the plot
         labels.extend([band] * len(freq))
 
     # Create scatter plot
