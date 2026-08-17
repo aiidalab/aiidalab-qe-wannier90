@@ -24,7 +24,7 @@ dependencies = [
   'aiida-quantumespresso>=4.8',
   'aiida-wannier90-workflows @ git+https://github.com/aiidateam/aiida-wannier90-workflows@v2.7.2',
   'weas-widget>=0.1.25',
-  'aiida-skeaf @ git+https://github.com/aiidaplugins/aiida-skeaf@v0.2.0'
+  'aiida-skeaf @ git+https://github.com/aiidaplugins/aiida-skeaf@v0.2.1'
 ]
 dynamic = ['description', 'version']
 keywords = ['aiida', 'workflows', 'core-level', 'spectroscopy']
