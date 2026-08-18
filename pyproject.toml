@@ -22,7 +22,7 @@ classifiers = [
 dependencies = [
   'aiida-core>=2.3',
   'aiida-quantumespresso>=4.8',
-  'aiida-wannier90-workflows @ git+https://github.com/aiidateam/aiida-wannier90-workflows@v2.7.2',
+  'aiida-wannier90-workflows @ git+https://github.com/aiidateam/aiida-wannier90-workflows@v3.0.0',
   'weas-widget>=0.1.25',
   'aiida-skeaf @ git+https://github.com/aiidaplugins/aiida-skeaf@v0.2.1'
 ]
