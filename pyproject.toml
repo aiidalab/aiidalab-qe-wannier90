@@ -4,7 +4,7 @@ requires = ['flit_core>=3.4,<4']
 
 [project]
 authors = [
-  {name = 'Xing Wang', email = 'xingwang1991@gmail.com'}
+  { name = 'Xing Wang', email = 'xingwang1991@gmail.com' }
 ]
 classifiers = [
   'Development Status :: 4 - Beta',
@@ -21,14 +21,15 @@ classifiers = [
 ]
 dependencies = [
   'aiida-core>=2.3',
-  'aiida-quantumespresso>=4.8',
-  'aiida-wannier90-workflows @ git+https://github.com/aiidateam/aiida-wannier90-workflows@v3.0.0',
+  'aiida-quantumespresso>=5,<6',
+  # Temporary commit pin until aiidateam/aiida-wannier90-workflows#121 is released.
+  'aiida-wannier90-workflows @ git+https://github.com/aiidateam/aiida-wannier90-workflows@e3f289cf2d423b8fd78c6cc3be161793537e0881',
   'weas-widget>=0.1.25',
   'aiida-skeaf @ git+https://github.com/aiidaplugins/aiida-skeaf@v0.2.1'
 ]
 dynamic = ['description', 'version']
 keywords = ['aiida', 'workflows', 'core-level', 'spectroscopy']
-license = {file = 'LICENSE'}
+license = { file = 'LICENSE' }
 name = 'aiidalab-qe-wannier90'
 readme = 'README.md'
 requires-python = '>=3.9'
