@@ -22,8 +22,8 @@ classifiers = [
 dependencies = [
   'aiida-core>=2.3',
   'aiida-quantumespresso>=5,<6',
-  # Temporary commit pin until aiidateam/aiida-wannier90-workflows#121 is released.
-  'aiida-wannier90-workflows @ git+https://github.com/aiidateam/aiida-wannier90-workflows@f49d6c2b677f4913b6b77b6fbd44e2cc472ccd0d',
+  # aiida-wannier90-workflows v3.1.0 adds aiida-quantumespresso v5 support.
+  'aiida-wannier90-workflows @ git+https://github.com/aiidateam/aiida-wannier90-workflows@v3.1.0',
   'weas-widget>=0.1.25',
   'aiida-skeaf @ git+https://github.com/aiidaplugins/aiida-skeaf@v0.2.1'
 ]
