@@ -22,7 +22,6 @@ classifiers = [
 dependencies = [
   'aiida-core>=2.3',
   'aiida-quantumespresso>=5,<6',
-  # aiida-wannier90-workflows v3.1.0 adds aiida-quantumespresso v5 support.
   'aiida-wannier90-workflows @ git+https://github.com/aiidateam/aiida-wannier90-workflows@v3.1.0',
   'weas-widget>=0.1.25',
   'aiida-skeaf @ git+https://github.com/aiidaplugins/aiida-skeaf@v0.2.1'
