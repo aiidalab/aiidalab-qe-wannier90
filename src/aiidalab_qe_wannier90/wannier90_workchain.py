@@ -119,7 +119,6 @@ class QeAppWannier90BandsWorkChain(WorkChain):
             overrides = overrides,
             **kwargs,
         )
-        builder.pop('relax')
         builder.metadata.call_link_label = 'pw_bands'
 
         pw_code_info = {
