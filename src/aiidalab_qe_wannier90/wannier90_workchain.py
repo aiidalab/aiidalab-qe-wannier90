@@ -69,6 +69,11 @@ class QeAppWannier90BandsWorkChain(WorkChain):
             message='The wannier90 bands workchain failed.',
         )
 
+        spec.exit_code(
+            402, 'ERROR_SKEAF_WORKCHAIN_FAILED',
+            message='The SKEAF workchain failed.',
+        )
+
     @classmethod
     def get_builder_from_protocol(
         cls,
@@ -142,7 +147,7 @@ class QeAppWannier90BandsWorkChain(WorkChain):
 
         if not workchain.is_finished_ok:
             self.report('Pw bands workchain failed')
-            return self.exit_codes.ERROR_WORKCHAIN_FAILED
+            return self.exit_codes.ERROR_PW_BANDS_WORKCHAIN_FAILED
         else:
             self.out_many(
                 self.exposed_outputs(
@@ -156,7 +161,7 @@ class QeAppWannier90BandsWorkChain(WorkChain):
         pw_bands_node = self.ctx.pw_bands
         if not pw_bands_node.is_finished_ok:
             self.report('Bands workchain failed')
-            return self.exit_codes.ERROR_WORKCHAIN_FAILED
+            return self.exit_codes.ERROR_PW_BANDS_WORKCHAIN_FAILED
 
         scf_calc = pw_bands_node.outputs.scf_parameters.creator
         parent_folder = scf_calc.outputs.remote_folder
@@ -248,7 +253,7 @@ class QeAppWannier90BandsWorkChain(WorkChain):
 
         if not workchain.is_finished_ok:
             self.report('Optimize workchain failed')
-            return self.exit_codes.ERROR_WORKCHAIN_FAILED
+            return self.exit_codes.ERROR_WANNIER90_BANDS_WORKCHAIN_FAILED
         else:
             self.out_many(
                 self.exposed_outputs(
@@ -328,7 +333,7 @@ class QeAppWannier90BandsWorkChain(WorkChain):
 
         if not workchain.is_finished_ok:
             self.report('SKEAF workchain failed')
-            return self.exit_codes.ERROR_WORKCHAIN_FAILED
+            return self.exit_codes.ERROR_SKEAF_WORKCHAIN_FAILED
         else:
             self.out_many(
                 self.exposed_outputs(
