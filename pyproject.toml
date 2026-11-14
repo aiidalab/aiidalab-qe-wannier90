@@ -36,8 +36,8 @@ requires-python = '>=3.9'
 [project.entry-points.'aiida.workflows']
 'aiidalab_qe.wannier90' = 'aiidalab_qe_wannier90.wannier90_workchain:QeAppWannier90BandsWorkChain'
 
-[project.entry-points."aiidalab_qe.properties"]
-"wannier90" = "aiidalab_qe_wannier90.wannier90:wannier90"
+[project.entry-points."aiidalab_qe.plugins"]
+"wannier90" = "aiidalab_qe_wannier90.wannier90:Wannier90Plugin"
 
 [project.optional-dependencies]
 dev = [
@@ -95,7 +95,10 @@ filterwarnings = [
 [tool.ruff]
 ignore = [
   'D203',  # Incompatible with D211 `no-blank-line-before-class`
-  'D213'  # Incompatible with D212 `multi-line-summary-second-line`
+  'D213',  # Incompatible with D212 `multi-line-summary-second-line`
+  'D101',  # Missing docstring in public class
+  'D102',  # Missing docstring in public method
+  'PLC0415'  # Missing module docstring
 ]
 line-length = 120
 select = [
